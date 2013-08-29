@@ -52,12 +52,41 @@ function plugin_mURLin_uninstall()
 
 function plugin_mURLin_check_config()
 {
+    plugin_mURLin_CheckUpgrade();
     return true;
 }
 
 function plugin_mURLin_upgrade() 
 {
-	return false;
+    // Check if we need to upgrade
+    plugin_mURLin_CheckUpgrade();
+    return false;
+}
+
+function plugin_mURLin_CheckUpgrade()
+{
+    $installed_version = GetInstalledVersion(); // As reported by DB
+    $new_version = GetNewVersion();             // As reported by install files
+    
+    if ($installed_version != $new_version)
+    {
+        // We need to do install
+        mURLin_setup_tables();
+        import_xml_data(mURLin_returnXML(), true);
+        
+        db_execute("UPDATE plugin_config SET version='$new_version' WHERE directory='mURLin'");
+    }
+}
+
+function GetInstalledVersion()
+{
+    return db_fetch_cell("SELECT directory FROM plugin_config WHERE directory='mURLin'");
+}
+
+function GetNewVersion()
+{
+    $result = plugin_mURLin_version();
+    return $result['version'];
 }
 
 function mURLin_version()
@@ -68,12 +97,12 @@ function mURLin_version()
 function plugin_mURLin_version() 
 {
     return array(       'name'          => 'mURLin',
-                        'version' 	=> '1.0',
+                        'version' 	=> '0.1.3',
 			'longname'	=> 'URL Monitoring Agent',
 			'author'	=> 'James Payne',
-			'homepage'	=> 'http://withjames.co.uk',
-			'email'         => 'me@email.com',
-			'url'		=> 'http://checkforupdates.mywebsite.com/'
+			'homepage'	=> 'http://www.withjames.co.uk',
+			'email'         => 'jamoflaw@gmail.com',
+			'url'		=> 'http://www.withjames.co.uk/'
 			);
 }
 
@@ -312,7 +341,7 @@ function mURLin_returnXML()
 				<consolidation_function_id>4</consolidation_function_id>
 				<cdef_id>0</cdef_id>
 				<value></value>
-				<gprint_id>hash_060024e9c43831e54eca8069317a2ce8c6f751</gprint_id>
+				<gprint_id>hash_06002419414480d6897c8731c7dc6c5310653e</gprint_id>
 				<text_format>HTTP Return Code:</text_format>
 				<hard_return></hard_return>
 				<sequence>5</sequence>
@@ -450,6 +479,10 @@ function mURLin_returnXML()
 		<name>Normal</name>
 		<gprint_text>%8.2lf %s</gprint_text>
 	</hash_060024e9c43831e54eca8069317a2ce8c6f751>
+	<hash_06002419414480d6897c8731c7dc6c5310653e>
+		<name>Exact Numbers</name>
+		<gprint_text>%8.0lf</gprint_text>
+	</hash_06002419414480d6897c8731c7dc6c5310653e>
 </cacti>";
     
     return $xml;

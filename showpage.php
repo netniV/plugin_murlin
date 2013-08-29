@@ -46,11 +46,10 @@ if (!isset($_REQUEST["page"]))
     print "No page selected";
 }
 
-if (isset($_REQUEST["proxy"]))
-    $proxy = $_REQUEST["proxy"];
+if (isset($_REQUEST["proxyserver"]))
+    $proxy = $_REQUEST["proxyaddress"];
 else
     $proxy = "";
-
 
 print "<PRE>";
 print htmlspecialchars(display_page_http($_REQUEST["page"], $_REQUEST["timeout"], $proxy));

@@ -332,11 +332,11 @@ function mURLin_CreateHiddenHostTable($host_id)
             <input type='text' value='' name='filtertext' id='filtertext' onkeyup='$(\"#filtertext\").keyup(function(event){if(event.keyCode == 13){\$(\"#filter\").click();}});' />
             <input type='button' title='Filter' onclick=\"mURLin_RefreshHosts($host_id, getElementById('filtertext').value)\" value='Filter Hosts...' name='filter' id='filter' />
             </div>";
-    print "<div id='hosttable' style='background-color:white;'></div>";
+    print "<div id='hosttable' style='background-color:white; overflow-y: scroll;'></div>";
     
     print "<input type='button' title='Select' onclick=\"mURLin_SelectNewHost($('input[name=chkHost]:checked').val())\" value='Select Host...' name='select' id='select' style='float:right;'/>
         <input type='button' title='Return' onclick=\"mURLin_SelectHostClick(false)\" value='Return' name='return' id='return' style='float:right;'/>";
-    
+        
     print "</div>";
     
     print "</div>";

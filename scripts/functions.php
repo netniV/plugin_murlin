@@ -119,7 +119,7 @@ function get_values($hostid)
     {
         //$indexes[] = $r['id']. "!!" . load_page($r['url'], $r['text_match']);
         
-        if ($r['proxyserver'] != 0)
+        if ($r['proxyserver'] > 0)
             $proxy = $r['proxyaddress'];
         else
             $proxy = "";
@@ -134,7 +134,7 @@ function get_value($index)
     
     $result = db_fetch_row($sql);
     
-    if ($result['proxyserver'] != 0)
+    if ($result['proxyserver'] > 0)
         $proxy = $r['proxyaddress'];
     else
         $proxy = "";
@@ -221,7 +221,7 @@ function get_http_code($id)
     
     $result = db_fetch_row($sql);
     
-    if ($result['proxyserver'] != 0)
+    if ($result['proxyserver'] > 0)
         $proxy = $r['proxyaddress'];
     else
         $proxy = "";
@@ -270,12 +270,8 @@ function get_http_code($id)
 
 function display_page_http($url, $timeout, $proxyaddress)
 {
-    
     // Result
-    $result = mURLin_getPage($url, $timeout, "", $proxyaddress, "BODY");
-    
-    return $result;
-    
+    return mURLin_getPage($url, $timeout, "", $proxyaddress, "BODY");
 }
 
 function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $output)
@@ -299,10 +295,8 @@ function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $output)
     
     // Set a proxy if required
     if ($proxyaddress != "")
-    {
         curl_setopt($page, CURLOPT_PROXY, $proxyaddress);
-        curl_setopt($page, CURLOPT_HTTPPROXYTUNNEL, 0);
-    }
+
     
     $body = curl_exec($page);
     
@@ -313,17 +307,15 @@ function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $output)
     {
         // Nothing came back in the return
         $body = "ERROR - Nothing returned - CURL ERROR:";
-        $body .= curl_error($page); 
-
-        $body .= "\n\nUsing Proxy Address: " . $proxyaddress;      
+        $body .= curl_error($page);        
     }
  
     curl_close($page);
     
-    // Debug
-    //print "BODY:" . $body;
-    //print "HTTPCODE:" . $info['http_code'];
-    //print "TIME:" . $info['total_time'];
+//    // Debug
+//    print "BODY:" . $body;
+//    print "HTTPCODE:" . $info['http_code'];
+//    print "TIME:" . $info['total_time'];
     
     
     switch ($output)
