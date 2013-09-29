@@ -35,6 +35,7 @@
 chdir('../../');
 include_once("./include/auth.php");
 include_once("./include/config.php");
+include_once("./lib/data_query.php");
 include_once("./plugins/mURLin/scripts/functions.php");
 
 $_SESSION['custom']=false;
@@ -63,10 +64,20 @@ switch ($_REQUEST["action"])
             
             foreach($id as $i)
             {
+                // What host is mapped to $i
+                $sql = "SELECT host_id FROM plugin_mURLin_index WHERE id = $i";
+                $hostid = db_fetch_cell($sql);
+                
+                
                 $sql = "DELETE FROM plugin_mURLin_index WHERE id = $i";
                 db_execute($sql);
+                
+                // ReIndex the Data Query
+                $sql = "SELECT id FROM snmp_query WHERE name='mURLin - URL Agent'";
+                $snmpid = db_fetch_cell($sql);
+                data_query_update_host_cache_from_buffer($hostid, $snmpid, $tmp);
             }
-            
+                        
             // Redirect
             header( "Location: mURLin.php" );
             
@@ -313,7 +324,11 @@ function mURLin_CreateURLTable($results)
         print "</td>";
               
         print "<td onClick=\"CheckBox('chk_$id','select_all');\">";
-        print "<strong><a href='showpage.php?page=$url' onclick=\"window.open('showpage.php?page=$url', 'myWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400'); return false\">" . $url . "</a></strong>";
+        
+        // Encode the URL so it doesn't inject extra information into the showpage.php page
+        $urlenc = urlencode($url);
+        
+        print "<strong><a href='showpage.php?page=$url' onclick=\"window.open('showpage.php?page=$urlenc&timeout=10', 'myWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400'); return false\">" . $url . "</a></strong>";
         print "</td>";
         
         print "<td onClick=\"CheckBox('chk_$id','select_all');\">";

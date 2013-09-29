@@ -1,3 +1,63 @@
+function mURLin_ValidateURLForm()
+{
+    var host;
+    var URL;
+    var timeout;
+    var proxyserver;
+    var proxyenabled;
+    
+    var result = true;
+    
+    // Validate each entry
+    host = document.getElementById('selected_host');
+    if (host.value === "")
+    {
+       alert("You must select a host to map the URL to.")
+       result = false;
+    }
+    
+    URL = document.getElementById('url');
+    if (!ValidateURL(URL.value))
+    {
+       URL.style.background = '#FFAAAA';
+       result = false;
+    }
+    else
+    {
+       URL.style.background = '#FFFFFF';
+    }
+    
+    timeout = document.getElementById('timeout');
+    if (timeout.value < 0 || timeout.value > 100 || timeout.value === "")
+    {
+       timeout.style.background = '#FFAAAA';
+       result = false;
+    }
+    else
+    {
+       timeout.style.background = '#FFFFFF';
+    }
+    
+    proxyserver = document.getElementById('proxyaddress');
+    proxyenabled = document.getElementById('proxyserver');
+    if (proxyserver.value == "" && proxyenabled.checked == true)
+    {
+       proxyserver.style.background = '#FFAAAA';
+       result = false;
+    }
+    else
+    {
+       proxyserver.style.background = '#FFFFFF';
+    }
+
+    return result;
+}
+
+function ValidateURL(url)
+{
+      return /^(ftp|http|https):\/\/[^ "]+$/.test(url);
+}
+
 
 function mURLin_test_match(text_match, url, timeout, proxyserver, proxyaddress)
 {
@@ -19,7 +79,7 @@ function mURLin_open_url(url, timeout, proxyserver, proxyaddress)
     if (proxyserver === true)
         proxy = "&proxy=" + proxyaddress;
     
-    window.open('showpage.php?page=' + url + "&timeout=" + timeout + proxy, 'urlWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400');
+    window.open('showpage.php?page=' + encodeURIComponent(url) + "&timeout=" + timeout + proxy, 'urlWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400');
 }
 
 function CheckAll(id, value)

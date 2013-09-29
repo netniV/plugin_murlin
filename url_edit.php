@@ -52,16 +52,7 @@ switch ($_REQUEST["action"])
         
         case 'save':    // save the data from the form
             SaveHost();
-            break;
-        
-//        case 'host':
-//            // Clean the variable
-//            $report_id = $_GET['id'];
-//            if ($report_id != 'NEW')
-//                input_validate_input_number($report_id);
-//            
-//            SelectHost($report_id);
-//            break;            
+            break;         
 }
 
 function SaveHost()
@@ -81,6 +72,7 @@ function SaveHost()
         input_validate_input_number($indexid);
     }
     
+    $proxyaddress = sql_sanitize($proxyaddress);
     $url = sql_sanitize($url);
     $text_match = sql_sanitize($text_match);
        
@@ -172,7 +164,7 @@ function EditHost()
     
     
     // Create the form
-    echo "<form method=post onSubmit=''>";
+    echo "<form method=post onSubmit='return mURLin_ValidateURLForm()'>";
     
     mURLin_CreateHeader("Edit URL Mapping", $hostname . " (" . $url . ")");
     mURLin_CreateFormSubHeader("Host Details");
@@ -212,7 +204,7 @@ function EditHost()
     mURLin_CreateFormSubHeader("Timeout");
     
     $timeout_details[] = array('name' => 'Timeout',
-                              'description' => 'Timeout value in seconds. <br/>This is the number of seconds to wait for the website to respond before declaring the site is unavailable.',
+                              'description' => 'Timeout value in seconds. <br/>This is the number of seconds to wait for the website to respond before declaring the site is unavailable. (Between 1 and 99 seconds)',
                               'form' => "<br/><input type='text' title='Timeout in seconds' name='timeout' id='timeout' value='$timeout'/>");
     
     mURLin_CreateFormDetails($timeout_details);
@@ -332,7 +324,7 @@ function mURLin_CreateHiddenHostTable($host_id)
             <input type='text' value='' name='filtertext' id='filtertext' onkeyup='$(\"#filtertext\").keyup(function(event){if(event.keyCode == 13){\$(\"#filter\").click();}});' />
             <input type='button' title='Filter' onclick=\"mURLin_RefreshHosts($host_id, getElementById('filtertext').value)\" value='Filter Hosts...' name='filter' id='filter' />
             </div>";
-    print "<div id='hosttable' style='background-color:white; overflow-y: scroll;'></div>";
+    print "<div id='hosttable' style='background-color:white; overflow-y: scroll; height:89%'></div>";
     
     print "<input type='button' title='Select' onclick=\"mURLin_SelectNewHost($('input[name=chkHost]:checked').val())\" value='Select Host...' name='select' id='select' style='float:right;'/>
         <input type='button' title='Return' onclick=\"mURLin_SelectHostClick(false)\" value='Return' name='return' id='return' style='float:right;'/>";

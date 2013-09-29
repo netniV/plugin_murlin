@@ -54,6 +54,18 @@ if (isset($_SERVER["argv"][4])){ $id = $_SERVER["argv"][4]; }
 
 switch ($cmd)
 {
+    
+    case "count":
+    
+        $indexes = reindex($hostname);
+    
+        if (is_array($indexes))
+        {
+            print count($indexes);
+        }
+        
+        break;
+    
     case "index":
         
         $indexes = reindex($hostname);
@@ -83,6 +95,9 @@ switch ($cmd)
         
         if($value == "http_code")
             $indexes = get_http_codes($hostname);
+        
+        if($value == "downloadsize")
+            $indexes = mURLin_getDownloadSizes($hostname);
             
         if (is_array($indexes))
         {
@@ -104,6 +119,12 @@ switch ($cmd)
         if($value == "http_code")
             $indexes = get_http_code($id);
         
+        if($value == "sites")
+            $indexes = mURLin_getSite($id);
+        
+        if($value == "downloadsize")
+            $indexes = mURLin_getDownloadSize($id);
+                
         print $indexes;
                
         break;

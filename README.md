@@ -1,16 +1,21 @@
 mURLin
 ------
-
-
-
 Cacti URL Monitoring Plugin
 
-Planned Features
-----------------
+v0.1.6
+------
+- Fixed an issue where including sites with GET variables didn't display correctly in the previews
+- Added new data source - download size
+- Added current values to graph templates (last)
 
+v0.1.5
+------
+- Fixed the issue where the data query was still reporting a mapping where the last mapping was removed
 
-Alpha Release Log
------------------
+v0.1.4
+------
+- Properly fixed the scrolling problem now.... :)
+- Added client side validation to the user input forms
 
 ---
 
