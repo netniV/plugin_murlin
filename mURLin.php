@@ -309,8 +309,13 @@ function mURLin_CreateURLTable($results)
         $text_match = $row['text_match'];
         $proxyserver = $row['proxyserver'];
         
+        $proxystring = "";
+        
         if ($proxyserver != 0)
+        {
             $proxyaddress = $row['proxyaddress'];
+            $proxystring = "&proxy=" . $row['proxyaddress'] . "&proxyusername=" . $row['proxyusername'] . "&proxypassword=" . $row['proxypassword'];
+        }
         else
             $proxyaddress = "N/A";
         
@@ -328,7 +333,7 @@ function mURLin_CreateURLTable($results)
         // Encode the URL so it doesn't inject extra information into the showpage.php page
         $urlenc = urlencode($url);
         
-        print "<strong><a href='showpage.php?page=$url' onclick=\"window.open('showpage.php?page=$urlenc&timeout=10', 'myWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400'); return false\">" . $url . "</a></strong>";
+        print "<strong><a href='showpage.php?page=$url' onclick=\"window.open('showpage.php?page=$urlenc&timeout=$timeout$proxystring', 'myWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400'); return false\">" . $url . "</a></strong>";
         print "</td>";
         
         print "<td onClick=\"CheckBox('chk_$id','select_all');\">";

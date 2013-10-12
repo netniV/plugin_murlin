@@ -65,6 +65,8 @@ function SaveHost()
     $timeout = $_POST['timeout'];
     $proxyserver = isset($_POST['proxyserver']) ? 1 : 0;
     $proxyaddress = $_POST['proxyaddress'];
+    $proxyusername = $_POST['proxyusername'];
+    $proxypassword = $_POST['proxypassword'];
         
     // $indexid can be NEW or a number
     if ($indexid != "NEW")
@@ -73,6 +75,9 @@ function SaveHost()
     }
     
     $proxyaddress = sql_sanitize($proxyaddress);
+    $proxyusername = sql_sanitize($proxyusername);
+    $proxypassword = sql_sanitize($proxypassword);
+    
     $url = sql_sanitize($url);
     $text_match = sql_sanitize($text_match);
        
@@ -84,7 +89,7 @@ function SaveHost()
     {
         
         // NEW Entry
-        $sql = "INSERT INTO plugin_mURLin_index (host_id, url, text_match, timeout, proxyserver, proxyaddress) VALUES ($selected_host, '$url', '$text_match', $timeout, $proxyserver, '$proxyaddress')";
+        $sql = "INSERT INTO plugin_mURLin_index (host_id, url, text_match, timeout, proxyserver, proxyaddress, proxyusername, proxypassword) VALUES ($selected_host, '$url', '$text_match', $timeout, $proxyserver, '$proxyaddress', '$proxyusername', '$proxypassword')";
         
         // Insert into the database
         db_execute($sql);
@@ -95,7 +100,7 @@ function SaveHost()
     {
         
         // Existing entry
-        $sql = "UPDATE plugin_mURLin_index SET host_id = $selected_host, url = '$url', text_match = '$text_match', timeout = $timeout, proxyserver = $proxyserver, proxyaddress = '$proxyaddress' WHERE id = $indexid";
+        $sql = "UPDATE plugin_mURLin_index SET host_id = $selected_host, url = '$url', text_match = '$text_match', timeout = $timeout, proxyserver = $proxyserver, proxyaddress = '$proxyaddress', proxyusername = '$proxyusername', proxypassword = '$proxypassword'  WHERE id = $indexid";
         
         // Insert into the database
         db_execute($sql);
@@ -104,13 +109,13 @@ function SaveHost()
     }
     
 }
-
-function mURLin_includejavascript($filepath)
-{
-    print '<script type="text/javascript">';
-    include("$filepath");
-    print '</script>';
-}
+//
+//function mURLin_includejavascript($filepath)
+//{
+//    print '<script type="text/javascript">';
+//    include("$filepath");
+//    print '</script>';
+//}
 
 function EditHost()
 {
@@ -126,7 +131,7 @@ function EditHost()
 
     // format a query to return the results
     $sql = "
-        SELECT m.id as id, m.host_id as host_id, m.url as url, m.timeout as timeout, m.text_match as text_match, h.description as hostname, h.hostname as dns, m.proxyserver as proxyserver, m.proxyaddress as proxyaddress
+        SELECT m.id as id, m.host_id as host_id, m.url as url, m.timeout as timeout, m.text_match as text_match, h.description as hostname, h.hostname as dns, m.proxyserver as proxyserver, m.proxyaddress as proxyaddress, m.proxyusername as proxyusername, m.proxypassword as proxypassword
         FROM plugin_mURLin_index m
         INNER JOIN host h
         ON m.host_id = h.id
@@ -149,6 +154,8 @@ function EditHost()
         $DNS = "";
         $proxyserver = "";
         $proxyaddress = "";
+        $proxyusername = "";
+        $proxypassword = "";
     }
     else
     {
@@ -160,6 +167,8 @@ function EditHost()
         $DNS = $result['dns'];
         $proxyserver = $result['proxyserver'] > 0 ? "checked" : "";
         $proxyaddress = $result['proxyaddress'];
+        $proxyusername = $result['proxyusername'];
+        $proxypassword = $result['proxypassword'];
     }
     
     
@@ -186,7 +195,7 @@ function EditHost()
     $url_details[] = array('name' => 'URL (Website Address)',
                               'description' => 'The address of the webpage to monitor. The address must be preceeded by the protocol, http or https and if required must include the port number.',
                               'form' => "<br/><input type='text' name='url' id='url' value='$url' size='50' /> <br/><br/>
-                                        <input type='button' title='Open URL as text' onclick=\"mURLin_open_url(getElementById('url').value, getElementById('timeout').value, getElementById('proxyserver').checked, getElementById('proxyaddress').value)\" value='Open URL...' name='open_url' id='open_url' />");
+                                        <input type='button' title='Open URL as text' onclick=\"mURLin_open_url(getElementById('url').value, getElementById('timeout').value, getElementById('proxyserver').checked, getElementById('proxyaddress').value, getElementById('proxyusername').value, getElementById('proxypassword').value)\" value='Open URL...' name='open_url' id='open_url' />");
     
     mURLin_CreateFormDetails($url_details);
     
@@ -217,7 +226,12 @@ function EditHost()
     $proxy_details[] = array('name' => 'Proxy Server Address',
                               'description' => '<br/><br/>Only applies if selected above. Proxy server address. <br/></br>Example:<br/>http://proxy.localnet:3128<br/><br/>',
                               'form' => "<br/><input type='text' title='Proxy Server Address' name='proxyaddress' id='proxyaddress' size='50' value='$proxyaddress'/>");
-    
+    $proxy_details[] = array('name' => 'Proxy Server Username',
+                              'description' => '<br/>Only applies if selected above. Proxy server username (If the proxy requires authentication). <br/>Leave the server details blank if the proxy server requires no authentication.',
+                              'form' => "<br/><input type='text' autocomplete='off' title='Proxy Server Username' name='proxyusername' id='proxyusername' size='50' value='$proxyusername'/>");
+    $proxy_details[] = array('name' => 'Proxy Server Password',
+                              'description' => '<br/>Only applies if selected above. Proxy server password (If the proxy requires authentication). <br/>Leave the server details blank if the proxy server requires no authentication.',
+                              'form' => "<br/><input type='password' autocomplete='off' title='Proxy Server Username' name='proxypassword' id='proxypassword' size='50' value='$proxypassword'/>");
     mURLin_CreateFormDetails($proxy_details);
     
     

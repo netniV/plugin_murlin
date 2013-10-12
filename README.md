@@ -2,6 +2,11 @@ mURLin
 ------
 Cacti URL Monitoring Plugin
 
+v0.1.7
+------
+- Full proxy support inc authenticating proxies (Thanks to Vincent Geannin)
+- Automatic Upgrade Procedure now in place
+
 v0.1.6
 ------
 - Fixed an issue where including sites with GET variables didn't display correctly in the previews

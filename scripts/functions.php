@@ -38,6 +38,56 @@ function mURLin_includejavascript($filepath)
     print '</script>';
 }
 
+function mURLin_AddDBColumnIfNotExist($tablename, $columndata)
+{
+    // Only add the column if it doesn't exist!
+    if (mURLin_ColumnExist($tablename, $columndata['name']) != true)
+    {
+        api_plugin_db_add_column('mURLin', $tablename, $columndata);
+    }
+}
+
+function mURLin_TableExist($tablename)
+{
+    global $database_default;
+            
+    sql_sanitize($tablename);
+    
+           
+    $sql = "SELECT * FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA='$database_default'
+        AND TABLE_NAME='$tablename'
+            ";
+    
+    $result = db_fetch_assoc($sql);
+          
+    if (count($result) == 0)
+        return false;
+    else
+        return true;
+}
+
+function mURLin_ColumnExist($tablename, $columname)
+{
+    global $database_default;
+    
+    sql_sanitize($tablename);
+    sql_sanitize($columname);
+       
+    $sql = "SELECT * FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA='$database_default'
+            AND TABLE_NAME='$tablename'
+            AND COLUMN_NAME='$columname';
+            ";
+       
+    $result = db_fetch_assoc($sql);
+       
+    if (count($result) == 0)
+        return false;
+    else
+        return true;
+}
+
 function reindex($hostid) 
 {
     
@@ -123,13 +173,22 @@ function get_values($hostid)
     foreach($result as $r)
     {
         //$indexes[] = $r['id']. "!!" . load_page($r['url'], $r['text_match']);
+        $proxyident = ""; // default no authentication
         
         if ($r['proxyserver'] != 0)
+        {
+            // Check for proxy authentication
+            if ($r['proxyusername'] == "" && $r['proxypassword'] == "")
+                $proxyident = "";
+            else
+                $proxyident = $r['proxyusername'].':'.$r['proxypassword'];
+                
             $proxy = $r['proxyaddress'];
+        }
         else
             $proxy = "";
         
-        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, "TOTALTIME");
+        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, $proxyident, "TOTALTIME");
     }
 }
 
@@ -140,14 +199,23 @@ function get_value($index)
     
     $result = db_fetch_row($sql);
     
+    $proxyident = ""; // default no authentication
+    
     if ($result['proxyserver'] != 0)
-        $proxy = $r['proxyaddress'];
+    {
+        $proxy = $result['proxyaddress'];
+        
+        // Check for proxy authentication
+        if ($result['proxyusername'] == "" && $result['proxypassword'] == "")
+            $proxyident = "";
+        else
+            $proxyident = $result['proxyusername'].':'.$result['proxypassword'];
+    }
     else
         $proxy = "";
     
-    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, "TOTALTIME");
+    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, $proxyident, "TOTALTIME");
 }
-
 
 function get_http_codes($hostname)
 {
@@ -165,13 +233,23 @@ function get_http_codes($hostname)
     $indexes = array();
     foreach($result as $r)
     {
+        $proxyident = ""; // default no authentication
+        
         if ($r['proxyserver'] != 0)
+        {
             $proxy = $r['proxyaddress'];
+            
+            // Check for proxy authentication
+            if ($r['proxyusername'] == "" && $r['proxypassword'] == "")
+                $proxyident = "";
+            else
+                $proxyident = $r['proxyusername'].':'.$r['proxypassword'];
+        }
         else
             $proxy = "";
     
         //$indexes[] = $r['id']. "!!" . load_page_http($r['url']);
-        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, "HTTPCODE");
+        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, $proxyident, "HTTPCODE");
     }
 }
 
@@ -182,13 +260,23 @@ function get_http_code($id)
     
     $result = db_fetch_row($sql);
     
+    $proxyident = ""; // default no authentication
+    
     if ($result['proxyserver'] != 0)
-        $proxy = $r['proxyaddress'];
+    {
+        $proxy = $result['proxyaddress'];
+        
+        // Check for proxy authentication
+        if ($result['proxyusername'] == "" && $result['proxypassword'] == "")
+            $proxyident = "";
+        else
+            $proxyident = $result['proxyusername'].':'.$result['proxypassword'];
+    }
     else
         $proxy = "";
     
     //return load_page_http($result['url']);
-    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, "HTTPCODE");
+    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, $proxyident, "HTTPCODE");
 }
 
 function mURLin_getDownloadSizes($hostname)
@@ -207,12 +295,22 @@ function mURLin_getDownloadSizes($hostname)
     $indexes = array();
     foreach($result as $r)
     {
+        $proxyident = ""; // default no authentication
+        
         if ($r['proxyserver'] != 0)
+        {
             $proxy = $r['proxyaddress'];
+            
+            // Check for proxy authentication
+            if ($r['proxyusername'] == "" && $r['proxypassword'] == "")
+                $proxyident = "";
+            else
+                $proxyident = $r['proxyusername'].':'.$r['proxypassword'];
+        }
         else
             $proxy = "";
     
-        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, "DOWNLOADSIZE");
+        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, $proxyident, "DOWNLOADSIZE");
     }
 }
 
@@ -223,19 +321,29 @@ function mURLin_getDownloadSize($id)
     
     $result = db_fetch_row($sql);
     
+    $proxyident = ""; // default no authentication
+    
     if ($result['proxyserver'] != 0)
-        $proxy = $r['proxyaddress'];
+    {
+        $proxy = $result['proxyaddress'];
+        
+        // Check for proxy authentication
+        if ($result['proxyusername'] == "" && $result['proxypassword'] == "")
+            $proxyident = "";
+        else
+            $proxyident = $result['proxyusername'].':'.$result['proxypassword'];
+    }
     else
         $proxy = "";
     
-    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, "DOWNLOADSIZE");
+    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, $proxyident, "DOWNLOADSIZE");
 }
 
-function display_page_http($url, $timeout, $proxyaddress)
+function display_page_http($url, $timeout, $proxyaddress, $proxyident)
 {
     
     // Result
-    $result = mURLin_getPage($url, $timeout, "", $proxyaddress, "BODY");
+    $result = mURLin_getPage($url, $timeout, "", $proxyaddress, $proxyident, "BODY");
     
     return $result;
     
@@ -249,7 +357,7 @@ function mURLin_getSite($id)
     return db_fetch_cell($sql);
 }
 
-function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $output)
+function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $proxyident, $output)
 {
     // Result
     $result = 0;
@@ -265,14 +373,23 @@ function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $output)
     curl_setopt($page, CURLOPT_SSL_VERIFYHOST, false);
     
     // Set a sensible timeout
-    curl_setopt($page, CURLOPT_TIMEOUT,$timeout);
     curl_setopt($page, CURLOPT_CONNECTTIMEOUT ,$timeout);
+    curl_setopt($page, CURLOPT_TIMEOUT,$timeout + 3);
+    
+    // Set redirect options
+    curl_setopt($page, CURLOPT_FOLLOWLOCATION , true);
+    curl_setopt($page, CURLOPT_MAXREDIRS , 10);
         
     // Set a proxy if required
     if ($proxyaddress != "")
     {
         curl_setopt($page, CURLOPT_PROXY, $proxyaddress);
         curl_setopt($page, CURLOPT_HTTPPROXYTUNNEL, 0);
+        
+        if ($proxyident != "")
+        {
+            curl_setopt($page, CURLOPT_PROXYUSERPWD, $proxyident);
+        }
     }
     
     $body = curl_exec($page);

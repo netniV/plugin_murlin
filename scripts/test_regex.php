@@ -39,15 +39,26 @@ $url = $_GET['url'];
 $timeout = $_GET['timeout'];
 
 if (isset($_GET["proxyserver"]))
+{
     $proxy = $_GET["proxyaddress"];
+    
+    // Check for proxy authentication
+    if ($_GET['proxyusername'] == "" && $_GET['proxypassword'] == "")
+        $proxyident = "";
+    else
+        $proxyident = $r['proxyusername'].':'.$r['proxypassword'];
+}
 else
+{
     $proxy = "";
+    $proxyident = "";
+}
 
 // If no regex is supplied default allow all is assumed
 if ($regex == "")
     $regex="//";
 
-$pagetext = display_page_http($url, $timeout, $proxy);
+$pagetext = display_page_http($url, $timeout, $proxy, $proxyident);
 
 // See if the text is in the webpage
 if (preg_match($regex, $pagetext) != false)

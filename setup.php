@@ -32,14 +32,14 @@
 *******************************************************************************/
 //chdir('../../');
 include_once(dirname(__FILE__) . "/../../lib/import.php");
+include_once(dirname(__FILE__) . "/scripts/functions.php");
+
+// Perform upgrade if needed
+plugin_mURLin_upgrade();
 
 function plugin_mURLin_install()
 {
-    api_plugin_register_hook('mURLin', 'top_header_tabs','mURLin_show_tab', 'setup.php');
-    api_plugin_register_hook('mURLin', 'top_graph_header_tabs', 'mURLin_show_tab', 'setup.php');
-    api_plugin_register_hook('mURLin', 'draw_navigation_text', 'mURLin_draw_navigation_text', 'setup.php');
-    
-    api_plugin_register_realm('mURLin', 'mURLin.php,url_edit.php', 'Edit URL to Host Mappings', 1);
+    plugin_mURLin_check_hooks();
 	
     mURLin_setup_tables();
     import_xml_data(mURLin_returnXML(), true);
@@ -52,35 +52,54 @@ function plugin_mURLin_uninstall()
 
 function plugin_mURLin_check_config()
 {
-    plugin_mURLin_CheckUpgrade();
+    plugin_mURLin_check_upgrade();
     return true;
 }
 
 function plugin_mURLin_upgrade() 
 {
     // Check if we need to upgrade
-    plugin_mURLin_CheckUpgrade();
-    return false;
+    plugin_mURLin_check_upgrade();
+    return true;
 }
 
-function plugin_mURLin_CheckUpgrade()
+function plugin_mURLin_check_upgrade()
 {
     $installed_version = GetInstalledVersion(); // As reported by DB
     $new_version = GetNewVersion();             // As reported by install files
-    
+         
     if ($installed_version != $new_version)
     {
+        
         // We need to do install
         mURLin_setup_tables();
         import_xml_data(mURLin_returnXML(), true);
+        
+        plugin_mURLin_check_hooks();
         
         db_execute("UPDATE plugin_config SET version='$new_version' WHERE directory='mURLin'");
     }
 }
 
+function plugin_mURLin_check_hooks()
+{
+    api_plugin_register_hook('mURLin', 'top_header_tabs','mURLin_show_tab', 'setup.php');
+    api_plugin_register_hook('mURLin', 'top_graph_header_tabs', 'mURLin_show_tab', 'setup.php');
+    api_plugin_register_hook('mURLin', 'draw_navigation_text', 'mURLin_draw_navigation_text', 'setup.php');
+       
+    api_plugin_register_hook('mURLin', 'run_data_query', 'mURLin_poller_top', 'setup.php');
+    
+    api_plugin_register_realm('mURLin', 'mURLin.php,url_edit.php', 'Edit URL to Host Mappings', 1);
+}
+
 function GetInstalledVersion()
 {
-    return db_fetch_cell("SELECT directory FROM plugin_config WHERE directory='mURLin'");
+    return db_fetch_cell("SELECT version FROM plugin_config WHERE directory='mURLin'");
+}
+
+function mURLin_poller_top()
+{
+    echo "Poller Top";
 }
 
 function GetNewVersion()
@@ -97,7 +116,7 @@ function mURLin_version()
 function plugin_mURLin_version() 
 {
     return array(       'name'          => 'mURLin',
-                        'version' 	=> '0.1.6',
+                        'version' 	=> '0.21',
 			'longname'	=> 'URL Monitoring Agent',
 			'author'	=> 'James Payne',
 			'homepage'	=> 'http://www.withjames.co.uk',
@@ -105,8 +124,6 @@ function plugin_mURLin_version()
 			'url'		=> 'http://www.withjames.co.uk/'
 			);
 }
-
-
 
 function mURLin_show_tab () 
 {
@@ -126,21 +143,67 @@ function mURLin_show_tab ()
 function mURLin_setup_tables()
 {
     // Create database tables
+    if (!mURLin_TableExist('plugin_mURLin_index'))
+    {
+        $data = array();
+        $data['columns'][] = array('name' => 'id', 'type' => 'int(11)', 'NULL' => false, 'auto_increment' => true);
+        $data['primary'] = 'id';
+
+        $data['type'] = 'MyISAM';
+        $data['comment'] = 'Table of URL to Host Mappings';
+        api_plugin_db_table_create ('mURLin', 'plugin_mURLin_index', $data);
+    }
+    
+    // Create mURLin Host Table
     $data = array();
-    $data['columns'][] = array('name' => 'id', 'type' => 'int(11)', 'NULL' => false, 'auto_increment' => true);
     $data['columns'][] = array('name' => 'host_id', 'type' => 'int(11)');
     $data['columns'][] = array('name' => 'url', 'type' => 'VARCHAR(256)');
     $data['columns'][] = array('name' => 'text_match', 'type' => 'VARCHAR(1024)'); 
     $data['columns'][] = array('name' => 'timeout', 'type' => 'int(3)'); 
     $data['columns'][] = array('name' => 'proxyserver', 'type' => 'int(1)');
     $data['columns'][] = array('name' => 'proxyaddress', 'type' => 'VARCHAR(256)');
+    $data['columns'][] = array('name' => 'proxyusername', 'type' => 'VARCHAR(256)');
+    $data['columns'][] = array('name' => 'proxypassword', 'type' => 'VARCHAR(256)');
     
-    $data['primary'] = 'id';
+    foreach ($data['columns'] as $d)
+    {
+        mURLin_AddDBColumnIfNotExist('plugin_mURLin_index', $d);
+    }
     
-    $data['type'] = 'MyISAM';
-    $data['comment'] = 'Table of URL to Host Mappings';
-    api_plugin_db_table_create ('mURLin', 'plugin_mURLin_index', $data);
-   
+
+    // Cache Cache Table
+    if (mURLin_TableExist('plugin_mURLin_cache') != true)
+    {
+        $data = array();
+        $data['columns'][] = array('name' => 'id', 'type' => 'int(11)', 'NULL' => false);
+        $data['primary'] = 'id';
+    
+        $data['type'] = 'MyISAM';
+        $data['comment'] = 'mURLin Cache Table';
+        api_plugin_db_table_create ('mURLin', 'plugin_mURLin_cache', $data);
+    }
+    
+    $data = array();
+    $data['columns'][] = array('name' => 'total_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'http_code', 'type' => 'int(11)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'size_download', 'type' => 'int(11)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'redirect_count', 'type' => 'int(11)', 'NULL' => false);
+    
+    // Calculated values (based on download of successful data, including regex)
+    $data['columns'][] = array('name' => 'availability', 'type' => 'int(11)', 'NULL' => false);
+        
+    // Performance Values
+    $data['columns'][] = array('name' => 'namelookup_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'connect_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'pretransfer_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'starttransfer_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'redirect_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    
+    foreach ($data['columns'] as $d)
+    {
+        mURLin_AddDBColumnIfNotExist('plugin_mURLin_cache', $d);
+    }
+    
 }
 
 

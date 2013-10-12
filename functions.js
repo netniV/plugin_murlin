@@ -59,27 +59,27 @@ function ValidateURL(url)
 }
 
 
-function mURLin_test_match(text_match, url, timeout, proxyserver, proxyaddress)
+function mURLin_test_match(text_match, url, timeout, proxyserver, proxyaddress, proxyusername, proxypassword)
 {
     var proxy = "";
     
     if (proxyserver === true)
         proxy = "&proxy=" + proxyaddress;
     
-    $.get("./scripts/test_regex.php?regex=" + text_match + "&url=" + url + "&timeout=" + timeout + proxy, function(result) 
+    $.get("./scripts/test_regex.php?regex=" + text_match + "&url=" + url + "&timeout=" + timeout + proxy + "&proxyusername=" + proxyusername + "&proxypassword=" + proxypassword, function(result) 
     {
         alert(result);
     });    
 }
 
-function mURLin_open_url(url, timeout, proxyserver, proxyaddress)
+function mURLin_open_url(url, timeout, proxyserver, proxyaddress, proxyusername, proxypassword)
 {
     var proxy = "";
     
     if (proxyserver === true)
         proxy = "&proxy=" + proxyaddress;
     
-    window.open('showpage.php?page=' + encodeURIComponent(url) + "&timeout=" + timeout + proxy, 'urlWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400');
+    window.open('showpage.php?page=' + encodeURIComponent(url) + "&timeout=" + timeout + proxy + "&proxyusername=" + proxyusername + "&proxypassword=" + proxypassword, 'urlWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400');
 }
 
 function CheckAll(id, value)

@@ -46,14 +46,24 @@ if (!isset($_REQUEST["page"]))
     print "No page selected";
 }
 
+$proxyident = "";
+
 if (isset($_REQUEST["proxy"]))
+{
     $proxy = $_REQUEST["proxy"];
+    
+    // Check for proxy authentication
+    if ($_REQUEST['proxyusername'] == "" && $_REQUEST['proxypassword'] == "")
+        $proxyident = "";
+    else
+        $proxyident = $_REQUEST['proxyusername'].':'.$_REQUEST['proxypassword'];
+}
 else
     $proxy = "";
 
 
 print "<PRE>";
-print htmlspecialchars(display_page_http(urldecode($_REQUEST["page"]), $_REQUEST["timeout"], $proxy));
+print htmlspecialchars(display_page_http(urldecode($_REQUEST["page"]), $_REQUEST["timeout"], $proxy, $proxyident));
 print "</PRE>";
 
 
