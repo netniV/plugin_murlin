@@ -2,6 +2,13 @@ mURLin
 ------
 Cacti URL Monitoring Plugin
 
+v0.2.0
+------
+- Caching of results for faster lookups
+- Stacked Graphs (Detailed download times)
+- Availability Graph Template
+- Various bugfixes
+
 v0.1.7
 ------
 - Full proxy support inc authenticating proxies (Thanks to Vincent Geannin)

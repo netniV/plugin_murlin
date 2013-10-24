@@ -98,6 +98,27 @@ switch ($cmd)
         
         if($value == "downloadsize")
             $indexes = mURLin_getDownloadSizes($hostname);
+        
+        if($value == "redirect_count")
+            $indexes = mURLin_getRedirect_Counts($hostname);
+        
+        if($value == "availability")
+            $indexes = mURLin_getAvailabilities($hostname);
+        
+        if($value == "namelookup_time")
+            $indexes = mURLin_getNamelookup_Times($hostname);
+        
+        if($value == "connect_time")
+            $indexes = mURLin_getConnect_Times($hostname);
+        
+        if($value == "pretransfer_time")
+            $indexes = mURLin_getPretransfer_Times($hostname);
+        
+        if($value == "starttransfer_time")
+            $indexes = mURLin_getStarttransfer_Times($hostname);
+        
+        if($value == "redirect_time")
+            $indexes = mURLin_getRedirect_Times($hostname);
             
         if (is_array($indexes))
         {
@@ -109,7 +130,7 @@ switch ($cmd)
         
         break;
         
-        case "get":
+     case "get":
         
         $indexes = array();
         
@@ -124,6 +145,27 @@ switch ($cmd)
         
         if($value == "downloadsize")
             $indexes = mURLin_getDownloadSize($id);
+        
+        if($value == "redirect_count")
+            $indexes = mURLin_getRedirect_Count($id);
+        
+        if($value == "availability")
+            $indexes = mURLin_getAvailability($id);
+        
+        if($value == "namelookup_time")
+            $indexes = mURLin_getNamelookup_Time($id);
+        
+        if($value == "connect_time")
+            $indexes = mURLin_getConnect_Time($id);
+        
+        if($value == "pretransfer_time")
+            $indexes = mURLin_getPretransfer_Time($id);
+        
+        if($value == "starttransfer_time")
+            $indexes = mURLin_getStarttransfer_Time($id);
+        
+        if($value == "redirect_time")
+            $indexes = mURLin_getRedirect_Time($id);
                 
         print $indexes;
                

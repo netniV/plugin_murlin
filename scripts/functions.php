@@ -172,50 +172,191 @@ function get_values($hostid)
     $indexes = array();
     foreach($result as $r)
     {
-        //$indexes[] = $r['id']. "!!" . load_page($r['url'], $r['text_match']);
-        $proxyident = ""; // default no authentication
-        
-        if ($r['proxyserver'] != 0)
-        {
-            // Check for proxy authentication
-            if ($r['proxyusername'] == "" && $r['proxypassword'] == "")
-                $proxyident = "";
-            else
-                $proxyident = $r['proxyusername'].':'.$r['proxypassword'];
-                
-            $proxy = $r['proxyaddress'];
-        }
-        else
-            $proxy = "";
-        
-        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, $proxyident, "TOTALTIME");
+        return mURLin_cache_page($r, "total_time");
     }
 }
 
-function get_value($index)
+function get_value($id)
 {
-    input_validate_input_number($index);
-    $sql = "SELECT * FROM plugin_mURLin_index WHERE id = " .$index;
-    
-    $result = db_fetch_row($sql);
-    
-    $proxyident = ""; // default no authentication
-    
-    if ($result['proxyserver'] != 0)
-    {
-        $proxy = $result['proxyaddress'];
-        
-        // Check for proxy authentication
-        if ($result['proxyusername'] == "" && $result['proxypassword'] == "")
-            $proxyident = "";
-        else
-            $proxyident = $result['proxyusername'].':'.$result['proxypassword'];
-    }
-    else
-        $proxy = "";
-    
-    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, $proxyident, "TOTALTIME");
+    return mURLin_cache_page($id, "total_time");
 }
+
+function mURLin_getRedirect_Counts($hostname)
+{
+    input_validate_input_number($hostname);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " .$hostname;
+
+    $result = db_fetch_assoc($sql);
+    
+    if (!is_array($result))
+    {
+        return;
+    }
+    
+    // Init indexes
+    $indexes = array();
+    foreach($result as $r)
+    {
+        return mURLin_cache_page($r, "redirect_count");
+    }
+}
+
+function mURLin_getRedirect_Count($id)
+{
+    return mURLin_cache_page($id, "redirect_count");
+}
+
+function mURLin_getAvailabilities($hostname)
+{
+    input_validate_input_number($hostname);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " .$hostname;
+
+    $result = db_fetch_assoc($sql);
+    
+    if (!is_array($result))
+    {
+        return;
+    }
+    
+    // Init indexes
+    $indexes = array();
+    foreach($result as $r)
+    {
+        return mURLin_cache_page($r, "availability");
+    }
+}
+
+function mURLin_getAvailability($id)
+{
+    return mURLin_cache_page($id, "availability");
+}
+
+function mURLin_getNamelookup_Times($hostname)
+{
+    input_validate_input_number($hostname);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " .$hostname;
+
+    $result = db_fetch_assoc($sql);
+    
+    if (!is_array($result))
+    {
+        return;
+    }
+    
+    // Init indexes
+    $indexes = array();
+    foreach($result as $r)
+    {
+        return mURLin_cache_page($r, "namelookup_time");
+    }
+}
+
+function mURLin_getNamelookup_Time($id)
+{
+    return mURLin_cache_page($id, "namelookup_time");
+}
+
+function mURLin_getConnect_Times($hostname)
+{
+    input_validate_input_number($hostname);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " .$hostname;
+
+    $result = db_fetch_assoc($sql);
+    
+    if (!is_array($result))
+    {
+        return;
+    }
+    
+    // Init indexes
+    $indexes = array();
+    foreach($result as $r)
+    {
+        return mURLin_cache_page($r, "connect_time");
+    }
+}
+
+function mURLin_getConnect_Time($id)
+{
+    return mURLin_cache_page($id, "connect_time");
+}
+
+function mURLin_getPretransfer_Times($hostname)
+{
+    input_validate_input_number($hostname);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " .$hostname;
+
+    $result = db_fetch_assoc($sql);
+    
+    if (!is_array($result))
+    {
+        return;
+    }
+    
+    // Init indexes
+    $indexes = array();
+    foreach($result as $r)
+    {
+        return mURLin_cache_page($r, "pretransfer_time");
+    }
+}
+
+function mURLin_getPretransfer_Time($id)
+{
+    return mURLin_cache_page($id, "pretransfer_time");
+}
+
+function mURLin_getStarttransfer_Times($hostname)
+{
+    input_validate_input_number($hostname);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " .$hostname;
+
+    $result = db_fetch_assoc($sql);
+    
+    if (!is_array($result))
+    {
+        return;
+    }
+    
+    // Init indexes
+    $indexes = array();
+    foreach($result as $r)
+    {
+        return mURLin_cache_page($r, "starttransfer_time");
+    }
+}
+
+function mURLin_getStarttransfer_Time($id)
+{
+    return mURLin_cache_page($id, "starttransfer_time");
+}
+
+function mURLin_getRedirect_Times($hostname)
+{
+    input_validate_input_number($hostname);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " .$hostname;
+
+    $result = db_fetch_assoc($sql);
+    
+    if (!is_array($result))
+    {
+        return;
+    }
+    
+    // Init indexes
+    $indexes = array();
+    foreach($result as $r)
+    {
+        return mURLin_cache_page($r, "redirect_time");
+    }
+}
+
+function mURLin_getRedirect_Time($id)
+{
+    return mURLin_cache_page($id, "redirect_time");
+}
+
+
 
 function get_http_codes($hostname)
 {
@@ -233,50 +374,13 @@ function get_http_codes($hostname)
     $indexes = array();
     foreach($result as $r)
     {
-        $proxyident = ""; // default no authentication
-        
-        if ($r['proxyserver'] != 0)
-        {
-            $proxy = $r['proxyaddress'];
-            
-            // Check for proxy authentication
-            if ($r['proxyusername'] == "" && $r['proxypassword'] == "")
-                $proxyident = "";
-            else
-                $proxyident = $r['proxyusername'].':'.$r['proxypassword'];
-        }
-        else
-            $proxy = "";
-    
-        //$indexes[] = $r['id']. "!!" . load_page_http($r['url']);
-        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, $proxyident, "HTTPCODE");
+        return mURLin_cache_page($r, "http_code");
     }
 }
 
 function get_http_code($id)
 {
-    input_validate_input_number($id);
-    $sql = "SELECT * FROM plugin_mURLin_index WHERE id = " .$id;
-    
-    $result = db_fetch_row($sql);
-    
-    $proxyident = ""; // default no authentication
-    
-    if ($result['proxyserver'] != 0)
-    {
-        $proxy = $result['proxyaddress'];
-        
-        // Check for proxy authentication
-        if ($result['proxyusername'] == "" && $result['proxypassword'] == "")
-            $proxyident = "";
-        else
-            $proxyident = $result['proxyusername'].':'.$result['proxypassword'];
-    }
-    else
-        $proxy = "";
-    
-    //return load_page_http($result['url']);
-    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, $proxyident, "HTTPCODE");
+    return mURLin_cache_page($id, "http_code");
 }
 
 function mURLin_getDownloadSizes($hostname)
@@ -294,56 +398,39 @@ function mURLin_getDownloadSizes($hostname)
     // Init indexes
     $indexes = array();
     foreach($result as $r)
-    {
-        $proxyident = ""; // default no authentication
-        
-        if ($r['proxyserver'] != 0)
-        {
-            $proxy = $r['proxyaddress'];
-            
-            // Check for proxy authentication
-            if ($r['proxyusername'] == "" && $r['proxypassword'] == "")
-                $proxyident = "";
-            else
-                $proxyident = $r['proxyusername'].':'.$r['proxypassword'];
-        }
-        else
-            $proxy = "";
-    
-        $indexes[] = $r['id']. "!!" . mURLin_getPage($r['url'], $r['timeout'], $r['text_match'], $proxy, $proxyident, "DOWNLOADSIZE");
+    {    
+          return mURLin_cache_page($r, "size_download");
     }
 }
 
 function mURLin_getDownloadSize($id)
 {
-    input_validate_input_number($id);
-    $sql = "SELECT * FROM plugin_mURLin_index WHERE id = " .$id;
+
+    return mURLin_cache_page($id, "size_download");
     
-    $result = db_fetch_row($sql);
-    
-    $proxyident = ""; // default no authentication
-    
-    if ($result['proxyserver'] != 0)
-    {
-        $proxy = $result['proxyaddress'];
-        
-        // Check for proxy authentication
-        if ($result['proxyusername'] == "" && $result['proxypassword'] == "")
-            $proxyident = "";
-        else
-            $proxyident = $result['proxyusername'].':'.$result['proxypassword'];
-    }
-    else
-        $proxy = "";
-    
-    return mURLin_getPage($result['url'], $result['timeout'], $result['text_match'], $proxy, $proxyident, "DOWNLOADSIZE");
 }
+
 
 function display_page_http($url, $timeout, $proxyaddress, $proxyident)
 {
     
     // Result
-    $result = mURLin_getPage($url, $timeout, "", $proxyaddress, $proxyident, "BODY");
+    $input = array();
+    $input['url'] = $url;        
+    $input['text_match'] = ""; // No text match for this
+    $input['timeout'] = $timeout;  
+    $input['proxyserver'] = ($proxyaddress != "") ? 1 : 0;
+    $input['proxyaddress'] = $proxyaddress;
+    
+    if ($proxyident != "")
+    {
+        $proxyident = explode(":", $proxyident);
+        $input['proxyusername'] = $proxyident[0];
+        $input['proxypassword'] = $proxyident[1]; 
+    }
+
+    
+    $result = mURLin_cache_page($input, "body");
     
     return $result;
     
@@ -357,117 +444,400 @@ function mURLin_getSite($id)
     return db_fetch_cell($sql);
 }
 
-function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $proxyident, $output)
-{
-    // Result
-    $result = 0;
-        
-    // If no regex is supplied default allow all is assumed
-    if ($text_match == "")
-        $text_match="//";
-    
-    $page = curl_init($url);
-    
-    curl_setopt($page, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($page, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($page, CURLOPT_SSL_VERIFYHOST, false);
-    
-    // Set a sensible timeout
-    curl_setopt($page, CURLOPT_CONNECTTIMEOUT ,$timeout);
-    curl_setopt($page, CURLOPT_TIMEOUT,$timeout + 3);
-    
-    // Set redirect options
-    curl_setopt($page, CURLOPT_FOLLOWLOCATION , true);
-    curl_setopt($page, CURLOPT_MAXREDIRS , 10);
-        
-    // Set a proxy if required
-    if ($proxyaddress != "")
-    {
-        curl_setopt($page, CURLOPT_PROXY, $proxyaddress);
-        curl_setopt($page, CURLOPT_HTTPPROXYTUNNEL, 0);
-        
-        if ($proxyident != "")
-        {
-            curl_setopt($page, CURLOPT_PROXYUSERPWD, $proxyident);
-        }
-    }
-    
-    $body = curl_exec($page);
-    
-    // First check if we have successfully downloaded the webpage
-    $info = curl_getinfo($page);
-   
-    if ($body == "")
-    {
-        // Nothing came back in the return
-        $body = "ERROR - Nothing returned - CURL ERROR:";
-        $body .= curl_error($page); 
 
-        $body .= "\n\nUsing Proxy Address: " . $proxyaddress;      
+/*
+ * Function to get cURL to load a webpage and return information on the
+ * request.
+ * 
+ * $input will accept either of the following:
+ * 
+ * URL Mapping ID
+ * Array of URL Information
+ * 
+ * $output will vary depending on the string passed 
+ * 
+ * $input requires:
+ * url
+ * text_match
+ * timeout
+ * proxyserver
+ * proxyaddress
+ * proxyusername
+ * proxypassword
+ * 
+ */
+function mURLin_cache_page($input, $output = "NONE")
+{
+    // Default caching option
+    $insert_into_cache = true;
+            
+    // Ensure $body is always defined
+    $body = "";
+    
+    if (is_array($input))
+    {
+        // We are dealing with a request rather than a DB id lookup
+        // We can NEVER cache this
+        $insert_into_cache = false;
+        
+        // Variables
+        $url = $input['url'];
+        $text_match = $input['text_match'];
+        $timeout = $input['timeout'];
+        $proxyserver = $input['proxyserver'];
+
+
+        // Deal with a proxy if required
+        if ($proxyserver != 0)
+        {
+            $proxyaddress = $input['proxyaddress'];
+
+            $proxyusername = isset($input['proxyusername']) ? $input['proxyusername'] : "";
+            $proxypassword = isset($input['proxypassword']) ? $input['proxypassword'] : "";
+
+            // Check for proxy authentication
+            if ($proxyusername == "" && $proxypassword == "")
+                $proxyident = "";
+            else
+                $proxyident = $proxyusername.':'.$proxypassword;
+        }
+        else
+            $proxyaddress = "";
+
     }
- 
-    curl_close($page);
+    else
+    {    
+        input_validate_input_number($input);
+        
+        // Check if there is already a cached version of this query
+        $sql = "SELECT * FROM plugin_mURLin_cache WHERE id = $input";
+        $db_result = db_fetch_row($sql);
+        
+        if (count($db_result) != 0)
+        {
+            // There is a cached result
+            cacti_log("mURLin - INFO: Result has been accessed from Cache");
+            
+            // No need to recache
+            $insert_into_cache = false;
+            
+            $info = $db_result;
+        }
+        else
+        {
+            cacti_log("mURLin - INFO: Cache Miss");
+        }
+
+        // Get DB info
+        $sql = "SELECT * FROM plugin_mURLin_index WHERE id = $input";
+
+        $db_result = db_fetch_row($sql);
+
+        // Variables
+        $host_id = $db_result['host_id'];
+        $url = $db_result['url'];
+        $text_match = $db_result['text_match'];
+        $timeout = $db_result['timeout'];
+        $proxyserver = $db_result['proxyserver'];
+
+
+        // Deal with a proxy if required
+        if ($proxyserver != 0)
+        {
+            $proxyaddress = $db_result['proxyaddress'];
+
+            $proxyusername = $db_result['proxyusername'];
+            $proxypassword = $db_result['proxypassword'];
+
+            // Check for proxy authentication
+            if ($proxyusername == "" && $proxypassword == "")
+                $proxyident = "";
+            else
+                $proxyident = $proxyusername.':'.$proxypassword;
+        }
+        else
+            $proxyaddress = "";
+    }
+    
+    // Cache this page in the database for quicker lookups later
+    // If no regex is supplied default allow all is assumed
+    // if $info is already set here we can assume we are doing a DB lookup
+    // which will mean the text match has already been applied
+    if ($text_match == "" || isset($info)) 
+    {
+        $text_match="//";
+    }
+    
+    if (!isset($info))
+    {
+        // Info is not defined so the result is not cached!
+        $page = curl_init($url);
+
+        curl_setopt($page, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($page, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($page, CURLOPT_SSL_VERIFYHOST, false);
+
+        // Set a sensible timeout
+        curl_setopt($page, CURLOPT_CONNECTTIMEOUT ,$timeout);
+        curl_setopt($page, CURLOPT_TIMEOUT,$timeout + 3);
+
+        // Set redirect options
+        curl_setopt($page, CURLOPT_FOLLOWLOCATION , true);
+        curl_setopt($page, CURLOPT_MAXREDIRS , 10);
+
+        // Set a proxy if required
+        if ($proxyaddress != "")
+        {
+            curl_setopt($page, CURLOPT_PROXY, $proxyaddress);
+            curl_setopt($page, CURLOPT_HTTPPROXYTUNNEL, 0);
+
+            if ($proxyident != "")
+            {
+                curl_setopt($page, CURLOPT_PROXYUSERPWD, $proxyident);
+            }
+        }
+
+        $body = curl_exec($page);
+
+        if ($body == "")
+        {
+            // Nothing came back in the return
+            $curl_error = "ERROR - Nothing returned - CURL ERROR:";
+            $curl_error .= curl_error($page); 
+
+            $curl_error .= "\n\nUsing Proxy Address: " . $proxyaddress; 
+        }
+
+        // First check if we have successfully downloaded the webpage
+        $info = curl_getinfo($page);
+
+        curl_close($page);
+    
+    }
+    
+    $total_time = "";
+    $http_code = "";
+    $size_download = "";
+    $redirect_count = "";
+    $availability = "";
+    $namelookup_time = "";
+    $connect_time = "";
+    $pretransfer_time = "";
+    $starttransfer_time = "";
+    $redirect_time = "";
+    
+    // Text Match
+    if (@preg_match($text_match, $body))
+    {
+        // Page Text matches
+        
+        $total_time = $info['total_time'];
+        $http_code = $info['http_code'];
+        $size_download = $info['size_download'];
+        $redirect_count = $info['redirect_count'];
+        $availability = 100;
+        $namelookup_time = $info['namelookup_time'];
+        $connect_time = $info['connect_time'];
+        $pretransfer_time = $info['pretransfer_time'];
+        $starttransfer_time = $info['starttransfer_time'];
+        $redirect_time = $info['redirect_time'];
+    }
+    else
+    {
+        // Page text doesn't match
+        $total_time = "0";
+        $http_code = $info['http_code'];
+        $size_download = $info['size_download'];
+        $redirect_count = $info['redirect_count'];
+        $availability = 0;
+        $namelookup_time = "0";
+        $connect_time = "0";
+        $pretransfer_time = "0";
+        $starttransfer_time = "0";
+        $redirect_time = "0";
+    }
+
+    if ($insert_into_cache)
+    {
+        // Insert into database
+        $sql = "INSERT INTO plugin_mURLin_cache 
+            (id, total_time, http_code, size_download, redirect_count, availability, namelookup_time, connect_time, pretransfer_time, starttransfer_time, redirect_time) 
+            VALUES ($input, $total_time, $http_code, $size_download, $redirect_count, $availability, $namelookup_time, $connect_time, $pretransfer_time, $starttransfer_time, $redirect_time);";
+
+        db_execute($sql);
+    }
+    
     
     switch ($output)
     {
-        case "BODY":
-            return $body;
+        case "NONE":
+            // No value being returned
+            return;
             break;
         
-        // Total bytes downloaded
-        case "DOWNLOADSIZE":
+        case "body":
+            // Return page body or error 
             if ($body == "")
-            {
-                // Nothing came back in the return
-                $result = 0;
-            }
+                return $curl_error;
             else
-            {
-                $result = $info['size_download'];
-            }
+                return $body;
+            break;
             
-            return $result;
+        case "http_code":
+            // Return the http_code variable
+            return $http_code;
             break;
         
-        // Returned HTTP details
-        case "HTTPCODE":
-            if ($body == "")
-            {
-                // Nothing came back in the return
-                $result = 0;
-            }
-            else
-            {
-                $result = $info['http_code'];
-            }
-            
-            return $result;
+        case "total_time":
+            return $total_time;
             break;
         
-        // Total transfer time
-        case "TOTALTIME":
-            if ($body == "")
-            {
-                // Nothing came back in the return
-                $result = -0.001;
-            }
-
-            // See if the text is in the webpage
-            if (@preg_match($text_match, $body))
-            {
-                // Page Text matches
-                $result = $info['total_time'];
-            }
-            else
-            {
-                // Page text doesn't match
-                $result = -0.002;
-            }
+        case "size_download":
+            return $size_download;
+            break;
+        
+        case "redirect_count":
+            return $redirect_count;
+            break;
+        
+        case "availability":
+            return $availability;
+            break;
+        
+        case "namelookup_time":
+            return $namelookup_time;
+            break;
+        
+        case "connect_time":
+            return $connect_time;
+            break;
             
-            return $result;
+        case "pretransfer_time":
+            return $pretransfer_time;
+            break;
+        
+        case "starttransfer_time":
+            return $starttransfer_time;
+            break;
+        
+        case "redirect_time":
+            return $redirect_time;
             break;
     }
-    
+            
 }
+
+//function mURLin_getPage($url, $timeout, $text_match, $proxyaddress, $proxyident, $output)
+//{
+//    // Result
+//    $result = 0;
+//        
+//    // If no regex is supplied default allow all is assumed
+//    if ($text_match == "")
+//        $text_match="//";
+//    
+//    $page = curl_init($url);
+//    
+//    curl_setopt($page, CURLOPT_RETURNTRANSFER, 1);
+//    curl_setopt($page, CURLOPT_SSL_VERIFYPEER, false);
+//    curl_setopt($page, CURLOPT_SSL_VERIFYHOST, false);
+//    
+//    // Set a sensible timeout
+//    curl_setopt($page, CURLOPT_CONNECTTIMEOUT ,$timeout);
+//    curl_setopt($page, CURLOPT_TIMEOUT,$timeout + 3);
+//    
+//    // Set redirect options
+//    curl_setopt($page, CURLOPT_FOLLOWLOCATION , true);
+//    curl_setopt($page, CURLOPT_MAXREDIRS , 10);
+//        
+//    // Set a proxy if required
+//    if ($proxyaddress != "")
+//    {
+//        curl_setopt($page, CURLOPT_PROXY, $proxyaddress);
+//        curl_setopt($page, CURLOPT_HTTPPROXYTUNNEL, 0);
+//        
+//        if ($proxyident != "")
+//        {
+//            curl_setopt($page, CURLOPT_PROXYUSERPWD, $proxyident);
+//        }
+//    }
+//    
+//    $body = curl_exec($page);
+//    
+//    // First check if we have successfully downloaded the webpage
+//    $info = curl_getinfo($page);
+//   
+//    if ($body == "")
+//    {
+//        // Nothing came back in the return
+//        $body = "ERROR - Nothing returned - CURL ERROR:";
+//        $body .= curl_error($page); 
+//
+//        $body .= "\n\nUsing Proxy Address: " . $proxyaddress;      
+//    }
+// 
+//    curl_close($page);
+//    
+//    switch ($output)
+//    {
+//        case "BODY":
+//            return $body;
+//            break;
+//        
+//        // Total bytes downloaded
+//        case "DOWNLOADSIZE":
+//            if ($body == "")
+//            {
+//                // Nothing came back in the return
+//                $result = 0;
+//            }
+//            else
+//            {
+//                $result = $info['size_download'];
+//            }
+//            
+//            return $result;
+//            break;
+//        
+//        // Returned HTTP details
+//        case "HTTPCODE":
+//            if ($body == "")
+//            {
+//                // Nothing came back in the return
+//                $result = 0;
+//            }
+//            else
+//            {
+//                $result = $info['http_code'];
+//            }
+//            
+//            return $result;
+//            break;
+//        
+//        // Total transfer time
+//        case "TOTALTIME":
+//            if ($body == "")
+//            {
+//                // Nothing came back in the return
+//                $result = -0.001;
+//            }
+//
+//            // See if the text is in the webpage
+//            if (@preg_match($text_match, $body))
+//            {
+//                // Page Text matches
+//                $result = $info['total_time'];
+//            }
+//            else
+//            {
+//                // Page text doesn't match
+//                $result = -0.002;
+//            }
+//            
+//            return $result;
+//            break;
+//    }
+//    
+//}
 
 ?>
