@@ -31,6 +31,8 @@
            
 *******************************************************************************/
 
+include_once(dirname(__FILE__) . "/../../../include/global.php");
+
 function mURLin_includejavascript($filepath)
 {
     print '<script type="text/javascript">';
@@ -40,10 +42,36 @@ function mURLin_includejavascript($filepath)
 
 function mURLin_AddDBColumnIfNotExist($tablename, $columndata)
 {
+    global $database_default;
     // Only add the column if it doesn't exist!
     if (mURLin_ColumnExist($tablename, $columndata['name']) != true)
     {
         api_plugin_db_add_column('mURLin', $tablename, $columndata);
+    }
+    else
+    {
+        // Check for column validity
+        $columnname = $columndata['name'];
+        $column_type = $columndata['type'];
+        $cactidb = $database_default;
+        
+        $sql = "SELECT column_name, column_type 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE COLUMN_NAME='$columnname' 
+                AND TABLE_NAME='$tablename' 
+                    AND TABLE_SCHEMA='$cactidb'";
+    
+        $result = db_fetch_row($sql);
+        
+        if ($result['column_type'] != $column_type)
+        {
+            // This means the column type has changed since the table was created
+            cacti_log("mURLin: Table columns have changed!");
+            cacti_log("mURLin: Altering column " . $columnname . " to " . $column_type . " from " . $result['column_type']);
+            
+            $sql = "ALTER TABLE $tablename MODIFY $columnname $column_type";
+            db_execute($sql);
+        }
     }
 }
 

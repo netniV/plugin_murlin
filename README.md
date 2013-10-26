@@ -2,6 +2,11 @@ mURLin
 ------
 Cacti URL Monitoring Plugin
 
+v0.2.2
+------
+- Fixed bug with CactiEZ and the jQueryskin plugin which caused the cacti instance to display an error at the top of the page
+- Updated the database to support website URLs of greater than 256. The new maximum is 2048 characters. The UI has been updated to stop URLs of greater than this being passed to the functions.
+
 v0.2.1
 ------
 - Fixed a regression which meant that a site which takes longer than 1 second to respond on more than one field may show incorrectly

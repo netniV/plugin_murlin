@@ -27,6 +27,16 @@ function mURLin_ValidateURLForm()
        URL.style.background = '#FFFFFF';
     }
     
+    if ((document.getElementById('text_match').value).length >= 2048)
+    {
+       (document.getElementById('text_match')).style.background = '#FFAAAA';
+       result = false;
+    }
+    else
+    {
+       (document.getElementById('text_match')).style.background = '#FFFFFF';
+    }
+    
     timeout = document.getElementById('timeout');
     if (timeout.value < 0 || timeout.value > 100 || timeout.value === "")
     {
@@ -55,7 +65,10 @@ function mURLin_ValidateURLForm()
 
 function ValidateURL(url)
 {
+    if (url.length < 2048)
       return /^(ftp|http|https):\/\/[^ "]+$/.test(url);
+    else 
+        return false;
 }
 
 

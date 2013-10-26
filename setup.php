@@ -118,7 +118,7 @@ function mURLin_version()
 function plugin_mURLin_version() 
 {
     return array(       'name'          => 'mURLin',
-                        'version' 	=> '0.2.1',
+                        'version' 	=> '0.2.2',
 			'longname'	=> 'URL Monitoring Agent',
 			'author'	=> 'James Payne',
 			'homepage'	=> 'http://www.withjames.co.uk',
@@ -134,9 +134,9 @@ function mURLin_show_tab ()
         if (api_user_realm_auth('mURLin.php'))
         {
             if (substr_count($_SERVER["REQUEST_URI"], "mURLin.php") || substr_count($_SERVER["REQUEST_URI"], "url_edit.php"))
-                print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin_down.png" align="absmiddle" border="0"></a>';
+                print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin_down.png" align="absmiddle" border="0" alt="mURLin"></a>';
             else
-                print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin.png" align="absmiddle" border="0"></a>';
+                print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin.png" align="absmiddle" border="0" alt="mURLin"></a>';
         }
         
         
@@ -159,19 +159,19 @@ function mURLin_setup_tables()
     // Create mURLin Host Table
     $data = array();
     $data['columns'][] = array('name' => 'host_id', 'type' => 'int(11)');
-    $data['columns'][] = array('name' => 'url', 'type' => 'VARCHAR(256)');
-    $data['columns'][] = array('name' => 'text_match', 'type' => 'VARCHAR(1024)'); 
+    $data['columns'][] = array('name' => 'url', 'type' => 'varchar(2048)');
+    $data['columns'][] = array('name' => 'text_match', 'type' => 'varchar(2048)'); 
     $data['columns'][] = array('name' => 'timeout', 'type' => 'int(3)'); 
     $data['columns'][] = array('name' => 'proxyserver', 'type' => 'int(1)');
-    $data['columns'][] = array('name' => 'proxyaddress', 'type' => 'VARCHAR(256)');
-    $data['columns'][] = array('name' => 'proxyusername', 'type' => 'VARCHAR(256)');
-    $data['columns'][] = array('name' => 'proxypassword', 'type' => 'VARCHAR(256)');
+    $data['columns'][] = array('name' => 'proxyaddress', 'type' => 'varchar(256)');
+    $data['columns'][] = array('name' => 'proxyusername', 'type' => 'varchar(256)');
+    $data['columns'][] = array('name' => 'proxypassword', 'type' => 'varchar(256)');
     
     foreach ($data['columns'] as $d)
     {
         mURLin_AddDBColumnIfNotExist('plugin_mURLin_index', $d);
     }
-    
+
     if (mURLin_TableExist('plugin_mURLin_cache') == true && GetInstalledVersion() == '0.2.0')
     {
         // There was a db regression bug here we need to drop and recreate the cache table...
