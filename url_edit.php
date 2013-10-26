@@ -206,7 +206,7 @@ function EditHost()
     $text_details[] = array('name' => 'Text to Match',
                               'description' => 'The text within a webpage to check for each time the scan is run. The match is done using the php function preg_match. <br/><br/>Example:<br/>/Welcome to the site/<br/><br/><strong>Note that the expression should be enclosed in / as above.</strong><br/><br/>See <a href="http://php.net/manual/en/function.preg-match.php" target="_blank">this regex tutorial</a> for more examples.',
                               'form' => "<br/><textarea name='text_match' id='text_match' rows='10' cols='50'>$text_match</textarea> <br/><br/>
-                                        <input type='button' title='Text the regex function' onClick=\"mURLin_test_match(getElementById('text_match').value, getElementById('url').value, getElementById('timeout').value, getElementById('proxyserver').checked, getElementById('proxyaddress').value);\" value='Test' name='test_regex' id='test_regex' />");
+                                        <input type='button' title='Text the regex function' onClick=\"mURLin_test_match(getElementById('text_match').value, getElementById('url').value, getElementById('timeout').value, getElementById('proxyserver').checked, getElementById('proxyaddress').value, getElementById('proxyusername').value, getElementById('proxypassword').value);\" value='Test' name='test_regex' id='test_regex' />");
                                       
     mURLin_CreateFormDetails($text_details);
     

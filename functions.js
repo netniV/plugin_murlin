@@ -66,7 +66,7 @@ function mURLin_test_match(text_match, url, timeout, proxyserver, proxyaddress, 
     if (proxyserver === true)
         proxy = "&proxy=" + proxyaddress;
     
-    $.get("./scripts/test_regex.php?regex=" + text_match + "&url=" + url + "&timeout=" + timeout + proxy + "&proxyusername=" + proxyusername + "&proxypassword=" + proxypassword, function(result) 
+    $.get("./scripts/test_regex.php?regex=" + encodeURIComponent(text_match) + "&url=" + encodeURIComponent(url) + "&timeout=" + timeout + proxy + "&proxyusername=" + proxyusername + "&proxypassword=" + proxypassword, function(result) 
     {
         alert(result);
     });    
@@ -79,7 +79,7 @@ function mURLin_open_url(url, timeout, proxyserver, proxyaddress, proxyusername,
     if (proxyserver === true)
         proxy = "&proxy=" + proxyaddress;
     
-    window.open('showpage.php?page=' + encodeURIComponent(url) + "&timeout=" + timeout + proxy + "&proxyusername=" + proxyusername + "&proxypassword=" + proxypassword, 'urlWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400');
+    window.open('showpage.php?page=' + encodeURIComponent(url) + "&timeout=" + timeout + proxy + "&proxyusername=" + proxyusername + "&proxypassword=" + proxypassword, 'urlWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=yes, scrollbars=yes, width=600, height=400');
 }
 
 function CheckAll(id, value)

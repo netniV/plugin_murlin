@@ -118,7 +118,7 @@ function mURLin_version()
 function plugin_mURLin_version() 
 {
     return array(       'name'          => 'mURLin',
-                        'version' 	=> '0.2.0',
+                        'version' 	=> '0.2.1',
 			'longname'	=> 'URL Monitoring Agent',
 			'author'	=> 'James Payne',
 			'homepage'	=> 'http://www.withjames.co.uk',
@@ -172,6 +172,15 @@ function mURLin_setup_tables()
         mURLin_AddDBColumnIfNotExist('plugin_mURLin_index', $d);
     }
     
+    if (mURLin_TableExist('plugin_mURLin_cache') == true && GetInstalledVersion() == '0.2.0')
+    {
+        // There was a db regression bug here we need to drop and recreate the cache table...
+        $sql = "DROP TABLE plugin_mURLin_cache";
+        db_execute($sql);
+        
+        // The table will be recreated by the next step
+    }
+    
 
     // Cache Cache Table
     if (mURLin_TableExist('plugin_mURLin_cache') != true)
@@ -186,7 +195,7 @@ function mURLin_setup_tables()
     }
     
     $data = array();
-    $data['columns'][] = array('name' => 'total_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'total_time', 'type' => 'decimal(10,6)', 'NULL' => false);
     $data['columns'][] = array('name' => 'http_code', 'type' => 'int(11)', 'NULL' => false);
     $data['columns'][] = array('name' => 'size_download', 'type' => 'int(11)', 'NULL' => false);
     $data['columns'][] = array('name' => 'redirect_count', 'type' => 'int(11)', 'NULL' => false);
@@ -195,11 +204,11 @@ function mURLin_setup_tables()
     $data['columns'][] = array('name' => 'availability', 'type' => 'int(11)', 'NULL' => false);
         
     // Performance Values
-    $data['columns'][] = array('name' => 'namelookup_time', 'type' => 'decimal(10,10)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'connect_time', 'type' => 'decimal(10,10)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'pretransfer_time', 'type' => 'decimal(10,10)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'starttransfer_time', 'type' => 'decimal(10,10)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'redirect_time', 'type' => 'decimal(10,10)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'namelookup_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'connect_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'pretransfer_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'starttransfer_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+    $data['columns'][] = array('name' => 'redirect_time', 'type' => 'decimal(10,6)', 'NULL' => false);
     
     foreach ($data['columns'] as $d)
     {

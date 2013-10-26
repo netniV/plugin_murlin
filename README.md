@@ -2,6 +2,11 @@ mURLin
 ------
 Cacti URL Monitoring Plugin
 
+v0.2.1
+------
+- Fixed a regression which meant that a site which takes longer than 1 second to respond on more than one field may show incorrectly
+- Fixed bug with proxy support
+
 v0.2.0
 ------
 - Caching of results for faster lookups
