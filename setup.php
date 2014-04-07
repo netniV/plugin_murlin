@@ -118,7 +118,7 @@ function mURLin_version()
 function plugin_mURLin_version() 
 {
     return array(       'name'          => 'mURLin',
-                        'version' 	=> '0.2.2',
+                        'version' 	=> '0.2.3',
 			'longname'	=> 'URL Monitoring Agent',
 			'author'	=> 'James Payne',
 			'homepage'	=> 'http://www.withjames.co.uk',

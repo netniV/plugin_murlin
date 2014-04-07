@@ -2,6 +2,12 @@ mURLin
 ------
 Cacti URL Monitoring Plugin
 
+v0.2.3
+------
+- Updated source to mirror Cacti coding style
+- Updated to use global log setting to filter when to log
+- Updated to use cache for availability value
+
 v0.2.2
 ------
 - Fixed bug with CactiEZ and the jQueryskin plugin which caused the cacti instance to display an error at the top of the page
