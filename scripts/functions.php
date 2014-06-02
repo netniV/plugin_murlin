@@ -131,6 +131,26 @@ function reindex($hostid) {
     return $indexes;
 }
 
+function get_ids($hostid)
+{
+    input_validate_input_number($hostid);
+    $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " . $hostid;
+
+    $result = db_fetch_assoc($sql);
+
+    if (!is_array($result)) {
+        return;
+    }
+
+    // Init indexes
+    $indexes = array();
+    foreach ($result as $r) {
+        $indexes[] = $r['id'] . "!!" . $r['id'];
+    }
+
+    return $indexes;
+}
+
 function get_sites($hostid) {
     input_validate_input_number($hostid);
     $sql = "SELECT * FROM plugin_mURLin_index WHERE host_id = " . $hostid;

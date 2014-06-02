@@ -2,6 +2,11 @@ mURLin
 ------
 Cacti URL Monitoring Plugin
 
+v0.2.4
+------
+- Added 'id' command to get the IDs of a hostname
+- Fixed indexing issue with template
+
 v0.2.3
 ------
 - Updated source to mirror Cacti coding style

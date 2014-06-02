@@ -84,6 +84,9 @@ switch ($cmd)
         
         $indexes = array();
         
+        if($value == "id")
+            $indexes = get_ids($hostname);
+                
         if($value == "sites")
             $indexes = get_sites($hostname);
         
