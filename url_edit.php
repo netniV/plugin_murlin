@@ -44,11 +44,11 @@ switch ($_REQUEST["action"])
 {
 	case '':
             // Show Cacti top
-            include_once("./include/top_header.php");
-             EditHost();
+		top_header();            
+		EditHost();
             // Show cacti bottom
-            include_once("./include/bottom_footer.php");
-            break;
+		bottom_footer();
+		break;
         
         case 'save':    // save the data from the form
             SaveHost();
@@ -73,13 +73,6 @@ function SaveHost()
     {
         input_validate_input_number($indexid);
     }
-    
-    $proxyaddress = sql_sanitize($proxyaddress);
-    $proxyusername = sql_sanitize($proxyusername);
-    $proxypassword = sql_sanitize($proxypassword);
-    
-    $url = sql_sanitize($url);
-    $text_match = sql_sanitize($text_match);
        
     // Check if its a number
     input_validate_input_number($selected_host);
@@ -89,10 +82,10 @@ function SaveHost()
     {
         
         // NEW Entry
-        $sql = "INSERT INTO plugin_mURLin_index (host_id, url, text_match, timeout, proxyserver, proxyaddress, proxyusername, proxypassword) VALUES ($selected_host, '$url', '$text_match', $timeout, $proxyserver, '$proxyaddress', '$proxyusername', '$proxypassword')";
+        $sql = "INSERT INTO plugin_mURLin_index (host_id, url, text_match, timeout, proxyserver, proxyaddress, proxyusername, proxypassword) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         // Insert into the database
-        db_execute($sql);
+        db_execute_prepared($sql,array($selected_host,$url,$text_match,$timeout,$proxyserver,$proxyaddress,$proxyusername,$proxypassword));
         $id = db_fetch_insert_id();
         header( "Location: mURLin.php?id=$indexid" );
     }
@@ -110,16 +103,16 @@ function SaveHost()
     
 }
 //
-//function mURLin_includejavascript($filepath)
-//{
-//    print '<script type="text/javascript">';
-//    include("$filepath");
-//    print '</script>';
-//}
+function mURLin_includejavascript($filepath)
+{
+    print '<script type="text/javascript">';
+    include("$filepath");
+    print '</script>';
+}
 
 function EditHost()
 {
-    mURLin_includejavascript("./plugins/mURLin/jquery-1.10.2.min.js");
+//    mURLin_includejavascript("./plugins/mURLin/jquery-1.10.2.min.js");
     mURLin_includejavascript("./plugins/mURLin/functions.js");
     
     // Get the index to load (if any)
