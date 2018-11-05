@@ -75,15 +75,12 @@ function mURLin_AddDBColumnIfNotExist($tablename, $columndata) {
 function mURLin_TableExist($tablename) {
     global $database_default;
 
-    sql_sanitize($tablename);
-
-
     $sql = "SELECT * FROM information_schema.COLUMNS
         WHERE TABLE_SCHEMA='$database_default'
-        AND TABLE_NAME='$tablename'
+        AND TABLE_NAME=?
             ";
 
-    $result = db_fetch_assoc($sql);
+    $result = db_fetch_assoc_prepared($sql, array($tablename) );
 
     if (count($result) == 0)
         return false;
@@ -94,16 +91,13 @@ function mURLin_TableExist($tablename) {
 function mURLin_ColumnExist($tablename, $columname) {
     global $database_default;
 
-    sql_sanitize($tablename);
-    sql_sanitize($columname);
-
     $sql = "SELECT * FROM information_schema.COLUMNS
         WHERE TABLE_SCHEMA='$database_default'
-            AND TABLE_NAME='$tablename'
-            AND COLUMN_NAME='$columname';
+            AND TABLE_NAME=?
+            AND COLUMN_NAME=?;
             ";
 
-    $result = db_fetch_assoc($sql);
+    $result = db_fetch_assoc_prepared($sql,array($tablename,$columname));
 
     if (count($result) == 0)
         return false;

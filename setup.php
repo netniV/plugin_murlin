@@ -32,6 +32,7 @@
 *******************************************************************************/
 //chdir('../../');
 include_once(dirname(__FILE__) . "/../../lib/import.php");
+include_once(dirname(__FILE__) . "/../../lib/utility.php");
 include_once(dirname(__FILE__) . "/scripts/functions.php");
 
 // Perform upgrade if needed
@@ -42,7 +43,8 @@ function plugin_mURLin_install()
     plugin_mURLin_check_hooks();
 	
     mURLin_setup_tables();
-    import_xml_data(mURLin_returnXML(), true);
+    $profile_id = db_fetch_cell('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
+    import_xml_data(mURLin_returnXML(), true, $profile_id);
 }
 
 function plugin_mURLin_uninstall()
@@ -73,7 +75,8 @@ function plugin_mURLin_check_upgrade()
         
         // We need to do install
         mURLin_setup_tables();
-        import_xml_data(mURLin_returnXML(), true);
+        $profile_id = db_fetch_cell('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
+        import_xml_data(mURLin_returnXML(), true, $profile_id);
         
         plugin_mURLin_check_hooks();
         
@@ -117,14 +120,9 @@ function mURLin_version()
 
 function plugin_mURLin_version() 
 {
-    return array(       'name'          => 'mURLin',
-                        'version' 	=> '0.2.4',
-			'longname'	=> 'URL Monitoring Agent',
-			'author'	=> 'James Payne',
-			'homepage'	=> 'http://www.withjames.co.uk',
-			'email'         => 'jamoflaw@gmail.com',
-			'url'		=> 'http://www.withjames.co.uk/'
-			);
+	global $config;
+	$info = parse_ini_file($config['base_path'] . '/plugins/mURLin/INFO', true);
+	return $info['info'];
 }
 
 function mURLin_show_tab () 

@@ -47,10 +47,10 @@ switch ($_REQUEST["action"])
 {
 	case '':
             // Show Cacti top
-            include_once("./include/top_header.php");
+	    top_header();
             mURLin_ShowURLs();
             // Show cacti bottom
-            include_once("./include/bottom_footer.php");
+	    bottom_footer();
             break;
               
         case 'delete':
@@ -145,8 +145,7 @@ switch ($_REQUEST["action"])
 function mURLin_PostMessage($messagetitle, $message, $confirmaction, $cancelaction)
 {
     // Include cacti top
-    include_once("./include/top_header.php");
-    
+    top_header();    
     print "<table align='center' width='60%' cellpadding='0' cellspacing='0' border='0' class='cactiTable' bgcolor='#6d88ad'>
 		<tbody><tr>
 			<td>";
@@ -168,7 +167,7 @@ function mURLin_PostMessage($messagetitle, $message, $confirmaction, $cancelacti
            </table>";
     
     // Show cacti bottom
-    include_once("./include/bottom_footer.php");
+	bottom_footer();
 }
 
 function mURLin_ShowURLs()
@@ -188,7 +187,7 @@ echo <<<HTMLBLOCK
 
 
 <form method='POST'>  
-  <div style="position:static;" id="main">
+  <div style="position:static;" id="maincontent">
         <table align="center" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tbody>
                     <tr>

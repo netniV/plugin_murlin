@@ -1,6 +1,9 @@
 mURLin
 ------
 Cacti URL Monitoring Plugin
+v1.0.0
+------
+- Made plugin Cacti 1.x compatible
 
 v0.2.4
 ------
