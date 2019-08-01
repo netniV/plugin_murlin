@@ -1,35 +1,16 @@
 <?php
-/*
- +-------------------------------------------------------------------------+
- | Copyright (C) 2004-2009 The Cacti Group                                 |
- |                                                                         |
- | This program is free software; you can redistribute it and/or           |
- | modify it under the terms of the GNU General Public License             |
- | as published by the Free Software Foundation; either version 2          |
- | of the License, or (at your option) any later version.                  |
- |                                                                         |
- | This program is distributed in the hope that it will be useful,         |
- | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           |
- | GNU General Public License for more details.                            |
- +-------------------------------------------------------------------------+
- | Cacti: The Complete RRDTool-based Graphing Solution                     |
- +-------------------------------------------------------------------------+
- | This code is designed, written, and maintained by the Cacti Group. See  |
- | about.php and/or the AUTHORS file for specific developer information.   |
- +-------------------------------------------------------------------------+
- | http://www.cacti.net/                                                   |
- +-------------------------------------------------------------------------+
-*/
 /*******************************************************************************
 
-    Author ......... James Payne
-    Contact ........ jamoflaw@gmail.com
-    Home Site ...... http://withjames.co.uk
-    Program ........ Cacti URL Monitoring Plugin
-    Purpose ........ Creates URL Monitoring Structure
-           
+	Original Author .... James Payne
+	Current Author ..... Mark Brugnoli-Vinten
+	Contact ............ netniv@hotmail.com
+
+	Program ............ Cacti URL Monitoring Plugin
+	Purpose ............ Creates URL Monitoring Structure
+	Copyright .......... 2004-2019
+
 *******************************************************************************/
+
 //chdir('../../');
 include_once(dirname(__FILE__) . "/../../lib/import.php");
 include_once(dirname(__FILE__) . "/../../lib/utility.php");
@@ -40,196 +21,180 @@ plugin_mURLin_upgrade();
 
 function plugin_mURLin_install()
 {
-    plugin_mURLin_check_hooks();
-	
-    mURLin_setup_tables();
-    $profile_id = db_fetch_cell('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
-    import_xml_data(mURLin_returnXML(), true, $profile_id);
+	plugin_mURLin_check_hooks();
+	mURLin_setup_tables();
+	mURLin_setup_templates();
 }
-
 function plugin_mURLin_uninstall()
 {
-    // nothing to do
+	//The following occurs automatically via api_plugin_db_changes_remove()
+	//api_plugin_db_table_remove ('mURLin', 'plugin_mURLin_index');
+	//api_plugin_db_table_remove ('mURLin', 'plugin_mURLin_cache');
 }
 
 function plugin_mURLin_check_config()
 {
-    plugin_mURLin_check_upgrade();
-    return true;
+	plugin_mURLin_check_upgrade();
+	return true;
 }
 
-function plugin_mURLin_upgrade() 
+function plugin_mURLin_upgrade()
 {
-    // Check if we need to upgrade
-    plugin_mURLin_check_upgrade();
-    return true;
+	// Check if we need to upgrade
+	plugin_mURLin_check_upgrade();
+	return true;
 }
 
 function plugin_mURLin_check_upgrade()
 {
-    $installed_version = GetInstalledVersion(); // As reported by DB
-    $new_version = GetNewVersion();             // As reported by install files
-         
-    if ($installed_version != $new_version)
-    {
-        
-        // We need to do install
-        mURLin_setup_tables();
-        $profile_id = db_fetch_cell('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
-        import_xml_data(mURLin_returnXML(), true, $profile_id);
-        
-        plugin_mURLin_check_hooks();
-        
-        db_execute("UPDATE plugin_config SET version='$new_version' WHERE directory='mURLin'");
-    }
+	$installed_version = mURLin_installed_version();	// As reported by DB
+	$new_version = mURLin_current_version();		// As reported by install files
+
+	if ($installed_version != $new_version)
+	{
+		// We need to do install
+		mURLin_setup_tables();
+		mURLin_setup_templates();
+
+		plugin_mURLin_check_hooks();
+
+		db_execute("UPDATE plugin_config SET version='$new_version' WHERE directory='mURLin'");
+	}
 }
 
 function plugin_mURLin_check_hooks()
 {
-    api_plugin_register_hook('mURLin', 'top_header_tabs','mURLin_show_tab', 'setup.php');
-    api_plugin_register_hook('mURLin', 'top_graph_header_tabs', 'mURLin_show_tab', 'setup.php');
-    api_plugin_register_hook('mURLin', 'draw_navigation_text', 'mURLin_draw_navigation_text', 'setup.php');
-    api_plugin_register_hook('mURLin', 'poller_bottom', 'mURLin_poller_bottom', 'setup.php');
-    
-    api_plugin_register_realm('mURLin', 'mURLin.php,url_edit.php', 'Edit URL to Host Mappings', 1);
+	api_plugin_register_hook('mURLin', 'top_header_tabs','mURLin_show_tab', 'setup.php');
+	api_plugin_register_hook('mURLin', 'top_graph_header_tabs', 'mURLin_show_tab', 'setup.php');
+	api_plugin_register_hook('mURLin', 'draw_navigation_text', 'mURLin_draw_navigation_text', 'setup.php');
+	api_plugin_register_hook('mURLin', 'poller_bottom', 'mURLin_poller_bottom', 'setup.php');
+
+	api_plugin_register_realm('mURLin', 'mURLin.php,url_edit.php', 'Edit URL to Host Mappings', 1);
 }
 
 function mURLin_poller_bottom()
 {
-    cacti_log("mURLin - INFO: Reached Poller Bottom, clearing cache");
-    // Remove all entries from the mURLin Poller cache as the poller cycle is complete
-    $sql = "TRUNCATE TABLE plugin_mURLin_cache";
-    db_execute($sql);
+	// Remove all entries from the mURLin Poller cache as the poller cycle is complete
+	cacti_log("mURLin - INFO: Reached Poller Bottom, clearing cache");
+	db_execute("TRUNCATE TABLE plugin_mURLin_cache");
 }
 
-function GetInstalledVersion()
+function mURLin_installed_version()
 {
-    return db_fetch_cell("SELECT version FROM plugin_config WHERE directory='mURLin'");
+	return db_fetch_cell("SELECT version FROM plugin_config WHERE directory='mURLin'");
 }
 
-function GetNewVersion()
+function mURLin_current_version()
 {
-    $result = plugin_mURLin_version();
-    return $result['version'];
+	$result = plugin_mURLin_version();
+	return $result['version'];
 }
 
 function mURLin_version()
 {
-    return plugin_mURLin_version();
+	return plugin_mURLin_version();
 }
 
-function plugin_mURLin_version() 
+function plugin_mURLin_version()
 {
 	global $config;
 	$info = parse_ini_file($config['base_path'] . '/plugins/mURLin/INFO', true);
 	return $info['info'];
 }
 
-function mURLin_show_tab () 
+function mURLin_show_tab ()
 {
 	global $config;
-        
-        if (api_user_realm_auth('mURLin.php'))
-        {
-            if (substr_count($_SERVER["REQUEST_URI"], "mURLin.php") || substr_count($_SERVER["REQUEST_URI"], "url_edit.php"))
-                print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin_down.png" align="absmiddle" border="0" alt="mURLin"></a>';
-            else
-                print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin.png" align="absmiddle" border="0" alt="mURLin"></a>';
-        }
-        
-        
+
+	if (api_user_realm_auth('mURLin.php'))
+	{
+		if (substr_count($_SERVER["REQUEST_URI"], "mURLin.php") || substr_count($_SERVER["REQUEST_URI"], "url_edit.php"))
+			print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin_down.png" align="absmiddle" border="0" alt="mURLin"></a>';
+		else
+			print '<a href="' . $config['url_path'] . 'plugins/mURLin/mURLin.php"><img src="' . $config['url_path'] . 'plugins/mURLin/images/tab_mURLin.png" align="absmiddle" border="0" alt="mURLin"></a>';
+	}
 }
 
 function mURLin_setup_tables()
 {
-    // Create database tables
-    if (!mURLin_TableExist('plugin_mURLin_index'))
-    {
-        $data = array();
-        $data['columns'][] = array('name' => 'id', 'type' => 'int(11)', 'NULL' => false, 'auto_increment' => true);
-        $data['primary'] = 'id';
+	// Create database tables
+	if (!mURLin_TableExist('plugin_mURLin_index'))
+	{
+		$data = array();
+	}
 
-        $data['type'] = 'MyISAM';
-        $data['comment'] = 'Table of URL to Host Mappings';
-        api_plugin_db_table_create ('mURLin', 'plugin_mURLin_index', $data);
-    }
-    
-    // Create mURLin Host Table
-    $data = array();
-    $data['columns'][] = array('name' => 'host_id', 'type' => 'int(11)');
-    $data['columns'][] = array('name' => 'url', 'type' => 'varchar(2048)');
-    $data['columns'][] = array('name' => 'text_match', 'type' => 'varchar(2048)'); 
-    $data['columns'][] = array('name' => 'timeout', 'type' => 'int(3)'); 
-    $data['columns'][] = array('name' => 'proxyserver', 'type' => 'int(1)');
-    $data['columns'][] = array('name' => 'proxyaddress', 'type' => 'varchar(256)');
-    $data['columns'][] = array('name' => 'proxyusername', 'type' => 'varchar(256)');
-    $data['columns'][] = array('name' => 'proxypassword', 'type' => 'varchar(256)');
-    
-    foreach ($data['columns'] as $d)
-    {
-        mURLin_AddDBColumnIfNotExist('plugin_mURLin_index', $d);
-    }
+	// Create mURLin Host Table
+	$data = array();
+	$data['columns'][] = array('name' => 'id', 'type' => 'int(11)', 'NULL' => false, 'auto_increment' => true);
+	$data['columns'][] = array('name' => 'host_id', 'type' => 'int(11)');
+	$data['columns'][] = array('name' => 'url', 'type' => 'varchar(2048)');
+	$data['columns'][] = array('name' => 'text_match', 'type' => 'varchar(2048)');
+	$data['columns'][] = array('name' => 'timeout', 'type' => 'int(3)');
+	$data['columns'][] = array('name' => 'proxyserver', 'type' => 'int(1)');
+	$data['columns'][] = array('name' => 'proxyaddress', 'type' => 'varchar(256)');
+	$data['columns'][] = array('name' => 'proxyusername', 'type' => 'varchar(256)');
+	$data['columns'][] = array('name' => 'proxypassword', 'type' => 'varchar(256)');
 
-    if (mURLin_TableExist('plugin_mURLin_cache') == true && GetInstalledVersion() == '0.2.0')
-    {
-        // There was a db regression bug here we need to drop and recreate the cache table...
-        $sql = "DROP TABLE plugin_mURLin_cache";
-        db_execute($sql);
-        
-        // The table will be recreated by the next step
-    }
-    
+	$data['primary'] = 'id';
 
-    // Cache Cache Table
-    if (mURLin_TableExist('plugin_mURLin_cache') != true)
-    {
-        $data = array();
-        $data['columns'][] = array('name' => 'id', 'type' => 'int(11)', 'NULL' => false);
-        $data['primary'] = 'id';
-    
-        $data['type'] = 'MyISAM';
-        $data['comment'] = 'mURLin Cache Table';
-        api_plugin_db_table_create ('mURLin', 'plugin_mURLin_cache', $data);
-    }
-    
-    $data = array();
-    $data['columns'][] = array('name' => 'total_time', 'type' => 'decimal(10,6)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'http_code', 'type' => 'int(11)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'size_download', 'type' => 'int(11)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'redirect_count', 'type' => 'int(11)', 'NULL' => false);
-    
-    // Calculated values (based on download of successful data, including regex)
-    $data['columns'][] = array('name' => 'availability', 'type' => 'int(11)', 'NULL' => false);
-        
-    // Performance Values
-    $data['columns'][] = array('name' => 'namelookup_time', 'type' => 'decimal(10,6)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'connect_time', 'type' => 'decimal(10,6)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'pretransfer_time', 'type' => 'decimal(10,6)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'starttransfer_time', 'type' => 'decimal(10,6)', 'NULL' => false);
-    $data['columns'][] = array('name' => 'redirect_time', 'type' => 'decimal(10,6)', 'NULL' => false);
-    
-    foreach ($data['columns'] as $d)
-    {
-        mURLin_AddDBColumnIfNotExist('plugin_mURLin_cache', $d);
-    }
-    
+	$data['type'] = 'MyISAM';
+	$data['comment'] = 'Table of URL to Host Mappings';
+	api_plugin_db_table_create ('mURLin', 'plugin_mURLin_index', $data);
+
+	if (db_table_exists('plugin_mURLin_cache') && mURLin_installed_version() == '0.2.0')
+	{
+		// There was a db regression bug here we need to drop and recreate the cache table...
+		// The table will be recreated by the next step
+		db_execute("DROP TABLE plugin_mURLin_cache");
+
+	}
+
+	// Cache Cache Table
+	$data = array();
+	$data['columns'] = array();
+	$data['columns'][] = array('name' => 'id', 'type' => 'int(11)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'total_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'http_code', 'type' => 'int(11)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'size_download', 'type' => 'int(11)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'redirect_count', 'type' => 'int(11)', 'NULL' => false);
+
+	// Calculated values (based on download of successful data, including regex)
+	$data['columns'][] = array('name' => 'availability', 'type' => 'int(11)', 'NULL' => false);
+
+	// Performance Values
+	$data['columns'][] = array('name' => 'namelookup_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'connect_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'pretransfer_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'starttransfer_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+	$data['columns'][] = array('name' => 'redirect_time', 'type' => 'decimal(10,6)', 'NULL' => false);
+
+	$data['primary'] = 'id';
+	$data['type'] = 'MyISAM';
+	$data['comment'] = 'mURLin Cache Table';
+
+	api_plugin_db_table_create ('mURLin', 'plugin_mURLin_cache', $data);
 }
 
+function mURLin_setup_templates() {
+	$profile_id = db_fetch_cell('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
+	$returnXML = mURLin_returnXML();
+	import_xml_data($returnXML, true, $profile_id);
+}
 
-function mURLin_draw_navigation_text ($nav) 
+function mURLin_draw_navigation_text ($nav)
 {
    $nav['mURLin.php:'] = array('title' => 'mURLin', 'mapping' => '', 'url' => 'mURLin.php', 'level' => '1');
    $nav['mURLin.php:confirmdelete'] = array('title' => 'Confirm Delete', 'mapping' => 'mURLin.php:', 'url' => 'mURLin.php', 'level' => '2');
-   $nav['url_edit.php:'] = array('title' => 'Edit URL Mapping', 'mapping' => 'mURLin.php:', 'url' => 'mURLin.php', 'level' => '2');   
-   
+   $nav['url_edit.php:'] = array('title' => 'Edit URL Mapping', 'mapping' => 'mURLin.php:', 'url' => 'mURLin.php', 'level' => '2');
+
    return $nav;
 }
 
 
 function mURLin_returnXML()
 {
-    $xml = "
-    <cacti>	
+	$xml = "
+	<cacti>
 	<hash_040024e404254402722ff686605143fb5a2f93>
 		<name>mURLin - URL Agent</name>
 		<description>Gets Monitored URLs Defined Through mURLin</description>
@@ -1310,8 +1275,7 @@ function mURLin_returnXML()
 		<gprint_text>%8.0lf</gprint_text>
 	</hash_06002419414480d6897c8731c7dc6c5310653e>
 </cacti>";
-    
-    return $xml;
+
+	return $xml;
 }
 
-?>

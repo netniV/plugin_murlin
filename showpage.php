@@ -28,7 +28,7 @@
     Home Site ...... http://withjames.co.uk
     Program ........ Cacti URL Monitoring Plugin
     Purpose ........ Creates URL Monitoring Structure
-           
+
 *******************************************************************************/
 
 include_once("./scripts/functions.php");
@@ -51,7 +51,7 @@ $proxyident = "";
 if (isset($_REQUEST["proxy"]))
 {
     $proxy = $_REQUEST["proxy"];
-    
+
     // Check for proxy authentication
     if ($_REQUEST['proxyusername'] == "" && $_REQUEST['proxypassword'] == "")
         $proxyident = "";
