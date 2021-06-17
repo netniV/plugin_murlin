@@ -438,16 +438,24 @@ function mURLin_ShowURLs()
 
 			if (empty($row['dns'])) {
 				$row['dns'] = __('N/A','mURLin');
-				$row['dnsurl'] = '';
+				$row['dnslink'] = '';
 			} else {
-				$row['dnsurl'] = '../../host.php?&action=edit&id=' . $row['host_id'];
+				$row['dnslink'] = '../../host.php?&action=edit&id=' . $row['host_id'];
+			}
+
+			if (empty($row['url'])) {
+				$row['url'] = __('N/A','mURLin');
+				$row['urllink'] = '';
+			} else {
+				$urlenc = urlencode($row['url']);
+				$row['urllink'] = 'showpage.php?page=' . $urlenc;
 			}
 
 			form_selectable_cell(filter_value($row['hostname'], get_request_var('filter'), 'url_edit.php?&action=edit&id=' . $row['id']), $row['id'],'10%');
 			form_selectable_cell(filter_value($row['id'], get_request_var('filter'), 'url_edit.php?&action=edit&id=' . $row['id']), $row['id'], '1%', 'text-align:right');
 //			form_selectable_cell($enabled, $row['id'], '5%', 'text-align:center');
-			form_selectable_cell(filter_value($row['dns'], get_request_var('filter'), $row['dnsurl']), $row['id'],'10%');
-			form_selectable_cell(filter_value($row['url'], get_request_var('filter'), 'url_edit.php?&action=edit&id=' . $row['id']), $row['id'],'10%');
+			form_selectable_cell(filter_value($row['dns'], get_request_var('filter'), $row['dnslink']), $row['id'],'10%');
+			form_selectable_cell(filter_value($row['url'], get_request_var('filter'), $row['urllink']), $row['id'],'10%');
 			form_selectable_cell($row['timeout'], $row['id'], '5%', 'text-align:right');
 			form_selectable_cell(filter_value($row['text_match'], get_request_var('filter'), 'url_edit.php?&action=edit&id=' . $row['id']), $row['id'],'10%');
 			form_selectable_cell($proxyaddress, $row['id'], '5%', 'text-align:center');

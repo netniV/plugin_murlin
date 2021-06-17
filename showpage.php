@@ -63,7 +63,12 @@ else
 
 
 print "<PRE>";
-print htmlspecialchars(display_page_http(urldecode($_REQUEST["page"]), $_REQUEST["timeout"], $proxy, $proxyident));
+if (!function_exists('curl_init')) {
+	echo 'FAILED TO FIND CURL MODULE';
+} else {
+	print htmlspecialchars(display_page_http(urldecode($_REQUEST["page"]), $_REQUEST["timeout"], $proxy, $proxyident));
+}
+
 print "</PRE>";
 
 
