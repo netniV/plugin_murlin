@@ -29,7 +29,7 @@
     Home Site ...... http://withjames.co.uk
     Program ........ Cacti URL Monitoring Plugin
     Purpose ........ Creates URL Monitoring Structure
-           
+
 *******************************************************************************/
 
 //include Cacti stuff
@@ -39,107 +39,101 @@ include_once(dirname(__FILE__) . "/../../../include/global.php");
 /* set default action */
 if (!isset($_REQUEST["action"])) { $_REQUEST["action"] = ""; }
 
-switch ($_REQUEST["action"]) 
-{
+switch ($_REQUEST["action"]) {
 	case '':
-            mURLin_GetHostTable();
-            break;
-        
-        case 'info':
-            $hid = $_GET['id'];
-            mURLin_GetHostInfo($hid);
-            break;
+		mURLin_GetHostTable();
+		break;
+
+	case 'info':
+		$hid = $_GET['id'];
+		mURLin_GetHostInfo($hid);
+		break;
 }
 
 
-function mURLin_GetHostInfo($id)
-{
-    // Gets a part of the host table
-    // Ensure we only have numbers
-    $id = preg_replace('/[^0-9]/', '', $id);
-    
-    $sql = "SELECT * FROM host WHERE id = " . $id;
-    
-    $result = db_fetch_row($sql);
-    
-    // Create a comma separated list of host_id,hostname,description
-    print $result['id'] . "," . $result['hostname'] . "," . $result['description'];
+function mURLin_GetHostInfo($id) {
+	// Gets a part of the host table
+	// Ensure we only have numbers
+	$id     = preg_replace('/[^0-9]/', '', $id);
+	$sql    = "SELECT * FROM host WHERE id = ?";
+	$result = db_fetch_row_prepared($sql, array($id));
+
+	// Create a comma separated list of host_id,hostname,description
+	print $result['id'] . "," . $result['hostname'] . "," . $result['description'];
 }
 
 function mURLin_GetHostTable()
 {
-    // ID is currently selected
-    if (isset($_GET['id'])) {$id = $_GET['id']; }
-    $filter = $_GET['filter'];
+	// ID is currently selected
+	if (isset($_GET['id'])) {
+		$id = $_GET['id'];
+	}
 
-    // Validate host ID
-    $id = preg_replace('/[^0-9]/', '', $id);
+	$filter = $_GET['filter'];
 
-    // Filter MUST NOT contain non alpha numeric characters
-    $filter = preg_replace('/[^a-z0-9]/i', '', $filter);
+	// Validate host ID
+	$id = preg_replace('/[^0-9]/', '', $id);
 
-    // We now have our clean filters
-    $sql = "SELECT * FROM host WHERE hostname LIKE '%" . $filter . "%' OR description LIKE '%" . $filter . "%'";
+	// Filter MUST NOT contain non alpha numeric characters
+	$filter = preg_replace('/[^a-z0-9]/i', '', $filter);
 
-    $results = db_fetch_assoc($sql);
+	// We now have our clean filters
+	$sql = "SELECT * FROM host
+		WHERE hostname LIKE ?
+		OR description LIKE ?";
 
-    // Create a table and format the rows
+	$results = db_fetch_assoc_prepared($sql, array("%${filter}%","%${filter}%"));
 
-    // TABLE HEADER
-    print "<table width='100%' class='cactiTable' bgcolor='#00438C' cellpadding='3' cellspacing='0' border='0'><tbody>";
-        print "<tr>
-            <td class=\"textHeaderDark\" style=\"padding:3px; text-align:left;\">
-                <strong>Hostname</strong>
-            </td>
-            <td class=\"textHeaderDark\" style=\"padding:3px; text-align:left;\">
-                <strong>IP/DNS Name</strong>
-            </td>
-            <td class=\"textHeaderDark\" style=\"padding:3px; text-align:left;\">
-                <strong>Selected</strong>
-            </td>";   
-    // END TABLE HEADER
+	// Create a table and format the rows
 
+	// TABLE HEADER
+	print "<table width='100%' class='cactiTable' bgcolor='#00438C' cellpadding='3' cellspacing='0' border='0'><tbody>";
+	print "<tr>
+		<td class=\"textHeaderDark\" style=\"padding:3px; text-align:left;\">
+			<strong>Hostname</strong>
+		</td>
+		<td class=\"textHeaderDark\" style=\"padding:3px; text-align:left;\">
+			<strong>IP/DNS Name</strong>
+		</td>
+		<td class=\"textHeaderDark\" style=\"padding:3px; text-align:left;\">
+			<strong>Selected</strong>
+		</td>
+	</tr>";
+	// END TABLE HEADER
 
-    //TABLE BODY
-    $bgswitch = true;
+	//TABLE BODY
+	$bgswitch = true;
 
-    foreach($results as $host)
-    {
-        $host_id = $host['id'];
-        $host_DNS = $host['hostname'];        
-        $host_hostname = $host['description'];
+	foreach($results as $host)
+	{
+		$host_id       = $host['id'];
+		$host_DNS      = $host['hostname'];
+		$host_hostname = $host['description'];
 
-        if ($id == $host_id)
-            $checked = "checked";
-        else
-            $checked = "";
+		$checked = ($id == $host_id) ? "checked" : "";
+		$bgcolor = ($bgswitch) ? "#E5E5E5" : "#F5F5F5";
 
-        if ($bgswitch)
-            $bgcolor = "#E5E5E5";
-        else
-            $bgcolor = "#F5F5F5";
+		// Create a table row with checkbox
+		print  "<tr onMouseOver=\"this.bgColor='#F7EEC0';\" onMouseOut=\"this.bgColor='$bgcolor';\" bgcolor='$bgcolor' onclick='mURLin_selectHost($host_id);' >
+			<td>
+				$host_hostname
+			</td>
+			<td>
+				$host_DNS
+			</td>
+			<td>
+				<input type='radio' id='$host_id' name='chkHost' value='$host_id' $checked />
+			</td>
+		</tr>";
 
-        // Create a table row with checkbox
-        print  "<tr onMouseOver=\"this.bgColor='#F7EEC0';\" onMouseOut=\"this.bgColor='$bgcolor';\" bgcolor='$bgcolor' onclick='mURLin_selectHost($host_id);' >
-                    <td>
-                    $host_hostname
-                    </td>
-                    <td>
-                    $host_DNS
-                    </td>
-                    <td>
-                    <input type='radio' id='$host_id' name='chkHost' value='$host_id' $checked />
-                    </td>
-                </tr>";
+		$bgswitch = !$bgswitch;
+	}
 
-        $bgswitch = !$bgswitch;
-    }
+	// END TABLE BODY
 
-    // END TABLE BODY
-
-    // TABLE FOOTER
-    print "</tbody></table>";
-    //END TABLE FOOTER
+	// TABLE FOOTER
+	print "</tbody></table>";
+	//END TABLE FOOTER
 }
 
 ?>

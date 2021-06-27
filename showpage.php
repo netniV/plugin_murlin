@@ -31,7 +31,7 @@
 
 *******************************************************************************/
 
-include_once("./scripts/functions.php");
+include_once(__DIR__ . "/include/functions.php");
 
 chdir('../../');
 include_once("./include/config.php");

@@ -12,6 +12,7 @@
 
 chdir('../../');
 include_once('./include/auth.php');
+include_once(__DIR__ . '/include/functions.php');
 include_once($config['base_path'] . '/include/config.php');
 include_once($config['base_path'] . '/plugins/mURLin/include/arrays.php');
 
@@ -75,13 +76,6 @@ function SaveHost() {
 
 	header('Location: mURLin.php?header=false');
 	exit;
-}
-//
-function mURLin_includejavascript($filepath)
-{
-	print '<script type="text/javascript">';
-	include("$filepath");
-	print '</script>';
 }
 
 function EditHost()

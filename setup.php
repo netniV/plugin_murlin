@@ -12,9 +12,9 @@
 *******************************************************************************/
 
 //chdir('../../');
-include_once(dirname(__FILE__) . "/../../lib/import.php");
-include_once(dirname(__FILE__) . "/../../lib/utility.php");
-include_once(dirname(__FILE__) . "/scripts/functions.php");
+include_once(__DIR__ . "/../../lib/import.php");
+include_once(__DIR__ . "/../../lib/utility.php");
+include_once(__DIR__ . "/include/functions.php");
 
 // Perform upgrade if needed
 plugin_mURLin_upgrade();

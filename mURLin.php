@@ -19,7 +19,7 @@ include_once($config['base_path'] . "/lib/functions.php");
 include_once($config['base_path'] . "/lib/data_query.php");
 include_once($config['base_path'] . "/plugins/mURLin/include/constants.php");
 include_once($config['base_path'] . "/plugins/mURLin/include/arrays.php");
-include_once($config['base_path'] . "/plugins/mURLin/scripts/functions.php");
+include_once($config['base_path'] . "/plugins/mURLin/include/functions.php");
 
 set_default_action();
 
@@ -256,7 +256,7 @@ function mURLin_ShowURLs()
 	$sort_direction = get_request_var('sort_direction');
 	$sort_limit = $num_rows*($page-1);
 
-	$sql = "SELECT i.*, h.description as hostname, h.hostname as dns
+	$sql = "SELECT i.*, h.description as hostname, h.hostname as dns, h.disabled
 		FROM plugin_mURLin_index i
 		LEFT JOIN host h on h.id = i.host_id
 		$sqlwhere
@@ -361,11 +361,11 @@ function mURLin_ShowURLs()
 			'sort' => 'ASC',
 			'tip' => __('The internal database ID for this URL.  Useful when debugging.', 'mURLin')
 		),
-//		'enabled' => array(
-//			'display' => __('Enabled', 'mURLin'),
-//			'align' => 'left',
-//			'sort' => 'ASC',
-//		),
+		'enabled' => array(
+			'display' => __('Enabled', 'mURLin'),
+			'align' => 'left',
+			'sort' => 'ASC',
+		),
 		'dns' => array(
 			'display' => __('DNS', 'mURLin'),
 			'align' => 'left',
@@ -406,17 +406,6 @@ function mURLin_ShowURLs()
 
 	if (cacti_sizeof($results)) {
 		foreach ($results as $row) {
-			$temp = db_fetch_row($sql);
-			$hostname = $temp['description'];
-			$DNS = $temp['hostname'];
-
-			$id = $row['id'];
-			$url = $row['url'];
-			$timeout = $row['timeout'];
-			$text_match = $row['text_match'];
-			$proxyserver = $row['proxyserver'];
-
-			$proxystring = "";
 
 			if ($proxyserver != 0)
 			{
@@ -428,7 +417,7 @@ function mURLin_ShowURLs()
 
 			form_alternate_row('line' . $row['id'], false);
 
-			$enabled = ($row['enabled'] == 'on' ? '<span class="deviceUp">' . __('Yes', 'mURLin') . '</span>' : '<span class="deviceDown">' . __('No', 'mURLin') . '</span>');
+			$enabled = ($row['disabled'] != 'on' ? '<span class="deviceUp">' . __('Yes', 'mURLin') . '</span>' : '<span class="deviceDown">' . __('No', 'mURLin') . '</span>');
 
 			$cell = '';
 
@@ -453,7 +442,7 @@ function mURLin_ShowURLs()
 
 			form_selectable_cell(filter_value($row['hostname'], get_request_var('filter'), 'url_edit.php?&action=edit&id=' . $row['id']), $row['id'],'10%');
 			form_selectable_cell(filter_value($row['id'], get_request_var('filter'), 'url_edit.php?&action=edit&id=' . $row['id']), $row['id'], '1%', 'text-align:right');
-//			form_selectable_cell($enabled, $row['id'], '5%', 'text-align:center');
+			form_selectable_cell($enabled, $row['id'], '5%', 'text-align:center');
 			form_selectable_cell(filter_value($row['dns'], get_request_var('filter'), $row['dnslink']), $row['id'],'10%');
 			form_selectable_cell(filter_value($row['url'], get_request_var('filter'), $row['urllink']), $row['id'],'10%');
 			form_selectable_cell($row['timeout'], $row['id'], '5%', 'text-align:right');
@@ -473,57 +462,3 @@ function mURLin_ShowURLs()
 
 	form_end();
 }
-
-function mURLin_CreateURLTable($results)
-{
-	// Cycle through each result and draw the table
-	print "
-
-		<table width='100%'>
-			<tbody>";
-
-	foreach ($results as $row)
-	{
-		print "<tr width='100%' bgcolor='$bgcolor' id='row_$id' onMouseOver=\"this.bgColor='#F7EEC0';\" onMouseOut=\"this.bgColor='$bgcolor';\">
-			   <td onClick=\"CheckBox('chk_$id','select_all');\">";
-		print "<a href='url_edit.php?id=$id'><strong>$hostname</strong></a> "; // Print Hostname and Link
-		print "</td>";
-
-		print "<td onClick=\"CheckBox('chk_$id','select_all');\">";
-		print $DNS;
-		print "</td>";
-
-		print "<td onClick=\"CheckBox('chk_$id','select_all');\">";
-
-		// Encode the URL so it doesn't inject extra information into the showpage.php page
-		$urlenc = urlencode($url);
-
-		print "<strong><a href='showpage.php?page=$url' onclick=\"window.open('showpage.php?page=$urlenc&timeout=$timeout$proxystring', 'myWin', 'toolbar=no, directories=no, location=no, status=yes, menubar=no, resizable=no, scrollbars=yes, width=600, height=400'); return false\">" . $url . "</a></strong>";
-		print "</td>";
-
-		print "<td onClick=\"CheckBox('chk_$id','select_all');\">";
-		print $timeout;
-		print "</td>";
-
-		print "<td onClick=\"CheckBox('chk_$id','select_all');\" width='40%'>";
-		print "<PRE style='margin:3px;'>" . $text_match . "</PRE>";
-		print "</td>";
-
-		print "<td onClick=\"CheckBox('chk_$id','select_all');\" >";
-		print $proxyaddress;
-		print "</td>";
-
-		print "<td>";
-		print "<input type='checkbox' id='chk_$id' name='urlselect[]' value='$id' onClick=\"CheckAllFunction(this.checked, 'select_all');\">";
-		print "</td>";
-
-		print "</tr>";
-
-		$bgswitch += 1;
-	}
-
-	print "	 </tbody>
-		</table>";
-
-}
-
