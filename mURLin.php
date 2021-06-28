@@ -407,7 +407,7 @@ function mURLin_ShowURLs()
 	if (cacti_sizeof($results)) {
 		foreach ($results as $row) {
 
-			if ($proxyserver != 0)
+			if (!empty($row['proxyaddress']))
 			{
 				$proxyaddress = $row['proxyaddress'];
 				$proxystring = "&proxy=" . $row['proxyaddress'] . "&proxyusername=" . $row['proxyusername'] . "&proxypassword=" . $row['proxypassword'];
