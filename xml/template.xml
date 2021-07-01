@@ -3,7 +3,7 @@
 	<hash_040102e404254402722ff686605143fb5a2f93>
 		<name>mURLin - URL Agent</name>
 		<description>Gets Monitored URLs Defined Through mURLin</description>
-		<xml_path><path_cacti>/plugins/mURLin/xml/mURLin.xml</xml_path>
+		<xml_path>|path_cacti|/plugins/mURLin/xml/mURLin.xml</xml_path>
 		<data_input_id>hash_03010280e9e4c4191a5da189ae26d0e237f015</data_input_id>
 		<graphs>
 			<hash_11010254c40208a8969209397ebe6f3f726faf>
