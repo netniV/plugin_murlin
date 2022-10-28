@@ -133,7 +133,7 @@ function plugin_mURLin_actions() {
 	form_start('mURLin.php');
 
 	if (get_nfilter_request_var('drp_action') > 0) {
-		html_start_box($rc_device_actions{get_nfilter_request_var('drp_action')}, '60%', '', '3', 'center', '');
+		html_start_box($rc_device_actions[get_nfilter_request_var('drp_action')], '60%', '', '3', 'center', '');
 	} else {
 		html_start_box('', '60%', '', '3', 'center', '');
 	}

@@ -472,7 +472,7 @@ function mURLin_gatherData($hostid, $fields, $id = false) {
 	if (is_array($result)) {
 		foreach ($result as $r) {
 			if (empty($r['cache_id'])) {
-				echo "Caching for ${r['id']}\n";
+				echo "Caching for {$r['id']}\n";
 				mURLin_cache_page($r['id']);
 			}
 

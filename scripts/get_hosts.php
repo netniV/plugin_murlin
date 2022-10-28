@@ -82,7 +82,7 @@ function mURLin_GetHostTable()
 		WHERE hostname LIKE ?
 		OR description LIKE ?";
 
-	$results = db_fetch_assoc_prepared($sql, array("%${filter}%","%${filter}%"));
+	$results = db_fetch_assoc_prepared($sql, array("%{$filter}%","%{$filter}%"));
 
 	// Create a table and format the rows
 
