@@ -8,7 +8,7 @@
 
 	Program ............ Cacti URL Monitoring Plugin
 	Purpose ............ Creates URL Monitoring Structure
-	Copyright .......... 2004-2019
+	Copyright .......... 2004-2023
 
 *******************************************************************************/
 
